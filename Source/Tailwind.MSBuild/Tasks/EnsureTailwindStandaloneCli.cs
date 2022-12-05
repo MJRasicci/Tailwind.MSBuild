@@ -40,7 +40,7 @@ namespace Tailwind.MSBuild.Tasks
 		public override bool Execute()
 		{
 			var platformFileName = PlatformCommandMap[(CurrentPlatform(), RuntimeInformation.OSArchitecture)];
-			StandaloneCliPath = Path.Combine(InstallPath, platformFileName);
+			StandaloneCliPath = Path.GetFullPath(Path.Combine(InstallPath, platformFileName));
 
 			if (File.Exists(StandaloneCliPath))
 				return true;

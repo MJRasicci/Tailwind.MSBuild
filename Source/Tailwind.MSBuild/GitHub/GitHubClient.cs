@@ -1,0 +1,93 @@
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Tailwind.MSBuild.GitHub
+{
+    /// <summary>
+    ///     Provides a basic client to download the Tailwind Standalone CLI from Github.
+    /// </summary>
+    internal class GitHubClient : IDisposable
+    {
+        private readonly HttpClient client;
+
+        private bool disposed;
+
+        /// <inheritdoc cref="Dispose()" />
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                    this.client.Dispose();
+
+                this.disposed = true;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="GitHubClient" /> class.
+        /// </summary>
+        public GitHubClient()
+        {
+            var product = Product.Details;
+            this.client = new HttpClient();
+
+            // The GitHub REST API requires a user-agent header for unauthenticated requests.
+            this.client.DefaultRequestHeaders.Add("User-Agent", $"{product.Name}/{product.Version} {product.Company}");
+        }
+
+        /// <summary>
+        ///     Get the latest published full release for the repository.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="TailwindRelease" /> object for the latest version of TailwindCSS.
+        /// </returns>
+        public async Task<TailwindRelease> GetLatestReleaseAsync()
+        {
+            var response = await this.client.GetStringAsync("https://api.github.com/repos/MJRasicci/tailwindcss/releases/latest");
+            return JsonSerializer.Deserialize<TailwindRelease>(response);
+        }
+
+        /// <summary>
+        ///     Get the published release with the specified tag.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="TailwindRelease" /> object for the specified version of TailwindCSS.
+        /// </returns>
+        public async Task<TailwindRelease> GetReleaseAsync(string tag)
+        {
+            var response = await this.client.GetStringAsync($"https://api.github.com/repos/MJRasicci/tailwindcss/releases/tags/{tag}");
+            return JsonSerializer.Deserialize<TailwindRelease>(response);
+        }
+
+        /// <summary>
+        ///     Downloads a <see cref="TailwindAsset" /> and returns an <see cref="ITailwindTool" /> which can be used to invoke the executable.
+        /// </summary>
+        /// <param name="tailwindDownload">
+        ///     The platform specific binary to download.
+        /// </param>
+        /// <param name="destinationFilePath">
+        ///     The file system path the file should be saved to.
+        /// </param>
+        public async Task GetAssetAsync(TailwindAsset tailwindDownload, string destinationFilePath)
+        {
+            var response = await this.client.GetByteArrayAsync(tailwindDownload.DownloadUrl);
+
+            using (var file = File.OpenWrite(destinationFilePath))
+            {
+                file.Write(response, 0, response.Length);
+                file.Close();
+            }
+        }
+    }
+}

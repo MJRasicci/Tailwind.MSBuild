@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{20205D14-6BDB-44D0-B26F-60EC40526D7F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailwind.MSBuild", "Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj", "{17B479A9-9788-4AD2-9404-5AC6B0966B6D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BB8069A9-F68B-4E64-B741-530ABA084AC7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailwind.MSBuild.Tests", "Tests\Tailwind.MSBuild.Tests\Tailwind.MSBuild.Tests.csproj", "{110A6AA8-1DC9-43DF-B451-898077DB16AC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{A5F5A284-7E1A-4584-AD8C-EA4F9D291D1B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17B479A9-9788-4AD2-9404-5AC6B0966B6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B479A9-9788-4AD2-9404-5AC6B0966B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B479A9-9788-4AD2-9404-5AC6B0966B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17B479A9-9788-4AD2-9404-5AC6B0966B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{110A6AA8-1DC9-43DF-B451-898077DB16AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{110A6AA8-1DC9-43DF-B451-898077DB16AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{110A6AA8-1DC9-43DF-B451-898077DB16AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{110A6AA8-1DC9-43DF-B451-898077DB16AC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{17B479A9-9788-4AD2-9404-5AC6B0966B6D} = {20205D14-6BDB-44D0-B26F-60EC40526D7F}
+		{110A6AA8-1DC9-43DF-B451-898077DB16AC} = {BB8069A9-F68B-4E64-B741-530ABA084AC7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90B44879-0FE2-4B66-A18B-B38B71D1C65A}
+	EndGlobalSection
+EndGlobal

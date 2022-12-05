@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		
+	<PropertyGroup>
+		<!-- The folder inside the NuGet package where the custom tasks will be located -->
+		<CustomTasksFolder>$(MSBuildThisFileDirectory)..\tasks\netstandard2.0</CustomTasksFolder>
+		<!-- Reference to the assembly which contains the MSBuild Tasks -->
+		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
+	</PropertyGroup>
+
+	<!-- Register our custom tasks -->
+	<UsingTask TaskName="$(MSBuildThisFileName).Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
+	<UsingTask TaskName="$(MSBuildThisFileName).Tasks.EnsureTailwindStandaloneCli" AssemblyFile="$(CustomTasksAssembly)"/>
+
+	<!-- Task parameters default values, these can be overridden -->
+	<PropertyGroup>
+		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
+		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(BaseIntermediateOutputPath)</TailwindInstallPath>
+		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDir)Tailwind\</TailwindConfigDir>
+		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">input.css</TailwindInputFile>
+		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDir)wwwroot\css\tailwind.css</TailwindOutputFile>
+		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
+		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
+	</PropertyGroup>
+
+	<!-- Exclude tailwind config files from the rest of the build process -->
+	<ItemGroup>
+		<None Include="$(TailwindConfigDir)**\*" />
+	</ItemGroup>
+	
+</Project>

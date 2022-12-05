@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -38,7 +39,6 @@ namespace Tailwind.MSBuild.Tasks
 		/// </summary>
 		public override bool Execute()
 		{
-			var product = Product.Details;
 			var platformFileName = PlatformCommandMap[(OSPlatform.Create(RuntimeInformation.OSDescription), RuntimeInformation.OSArchitecture)];
 			StandaloneCliPath = Path.Combine(InstallPath, platformFileName);
 
@@ -47,27 +47,18 @@ namespace Tailwind.MSBuild.Tasks
 
 			try
 			{
-				using (var client = new HttpClient())
+				using (var client = new GitHubClient())
 				{
-					// The GitHub REST API requires a user-agent header for unauthenticated requests.
-					client.DefaultRequestHeaders.Add("User-Agent", $"{product.Name}/{product.Version} {product.Company}");
-
-					var endpoint = Version.StartsWith("v")
-									? $"https://api.github.com/repos/MJRasicci/tailwindcss/releases/tags/{Version}"
-									: "https://api.github.com/repos/MJRasicci/tailwindcss/releases/latest";
-
-					var response = client.GetStringAsync(endpoint).GetAwaiter().GetResult();
-					var release = JsonSerializer.Deserialize<TailwindRelease>(response);
+					var release = (Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(Version)).GetAwaiter().GetResult();
 					var asset = release.Assets.FirstOrDefault(a => a.Name.Equals(platformFileName, StringComparison.OrdinalIgnoreCase));
 
 					if (asset != null)
 					{
-						var data = client.GetByteArrayAsync(asset.DownloadUrl).GetAwaiter().GetResult();
+						client.GetAssetAsync(asset, StandaloneCliPath).GetAwaiter().GetResult();
 
-						using (var file = File.OpenWrite(StandaloneCliPath))
+						if (!File.Exists(StandaloneCliPath))
 						{
-							file.Write(data, 0, data.Length);
-							file.Close();
+							Log.LogError($"Unable to download '{asset.Name}' to '{StandaloneCliPath}'");
 						}
 					}
 				}

@@ -39,11 +39,10 @@ namespace Tailwind.MSBuild.GitHub
         /// </summary>
         public GitHubClient()
         {
-            var product = Product.Details;
             this.client = new HttpClient();
 
             // The GitHub REST API requires a user-agent header for unauthenticated requests.
-            this.client.DefaultRequestHeaders.Add("User-Agent", $"{product.Name}/{product.Version} {product.Company}");
+            this.client.DefaultRequestHeaders.Add("User-Agent", "Tailwind.MSBuild/1.0.0 mjrasicci.dev");
         }
 
         /// <summary>

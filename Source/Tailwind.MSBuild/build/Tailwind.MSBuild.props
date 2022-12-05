@@ -3,14 +3,14 @@
 		
 	<PropertyGroup>
 		<!-- The folder inside the NuGet package where the custom tasks will be located -->
-		<CustomTasksFolder>$(MSBuildThisFileDirectory)..\tasks\netstandard2.0</CustomTasksFolder>
+		<CustomTasksFolder>$(MSBuildThisFileDirectory)..\lib\netstandard2.0</CustomTasksFolder>
 		<!-- Reference to the assembly which contains the MSBuild Tasks -->
 		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
 	</PropertyGroup>
 
 	<!-- Register our custom tasks -->
-	<UsingTask TaskName="$(MSBuildThisFileName).Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
-	<UsingTask TaskName="$(MSBuildThisFileName).Tasks.EnsureTailwindStandaloneCli" AssemblyFile="$(CustomTasksAssembly)"/>
+	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
+	<UsingTask TaskName="Tailwind.MSBuild.Tasks.EnsureTailwindStandaloneCli" AssemblyFile="$(CustomTasksAssembly)"/>
 
 	<!-- Task parameters default values, these can be overridden -->
 	<PropertyGroup>

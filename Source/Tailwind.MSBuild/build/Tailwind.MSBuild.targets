@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!-- Build TailwindCSS -->
-	<Target Name="AfterCompile" Outputs="$(GeneratedCssFile)">
+	<Target Name="BeforeCompile" Outputs="$(GeneratedCssFile)">
 		<!-- Ensure tailwind standalone-cli is available -->
 		<EnsureTailwindStandaloneCli Version="$(TailwindVersion)"
 									 InstallPath="$(TailwindInstallPath)">

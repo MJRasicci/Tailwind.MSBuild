@@ -39,7 +39,7 @@ namespace Tailwind.MSBuild.Tasks
 		/// </summary>
 		public override bool Execute()
 		{
-			var platformFileName = PlatformCommandMap[(OSPlatform.Create(RuntimeInformation.OSDescription), RuntimeInformation.OSArchitecture)];
+			var platformFileName = PlatformCommandMap[(CurrentPlatform(), RuntimeInformation.OSArchitecture)];
 			StandaloneCliPath = Path.Combine(InstallPath, platformFileName);
 
 			if (File.Exists(StandaloneCliPath))
@@ -70,6 +70,20 @@ namespace Tailwind.MSBuild.Tasks
 
             return !Log.HasLoggedErrors;
         }
+
+		private static OSPlatform CurrentPlatform()
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return OSPlatform.OSX;
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				return OSPlatform.Linux;
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				return OSPlatform.Windows;
+
+			throw new Exception("Unknown operating system");
+		}
 
 		private static readonly Dictionary<(OSPlatform OS, Architecture Arch), string> PlatformCommandMap = new Dictionary<(OSPlatform OS, Architecture Arch), string>
 		{

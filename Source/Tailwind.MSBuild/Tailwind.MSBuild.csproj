@@ -17,6 +17,14 @@
 		<Content Include="build\Tailwind.MSBuild.props" PackagePath="build\" />
 		<Content Include="build\Tailwind.MSBuild.targets" PackagePath="build\" />
 	</ItemGroup>
+	
+	<Target Name="_SetNuGetSourceTypeToCopyLocal" AfterTargets="ResolveReferences">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Update="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''">
+				<NuGetSourceType>Package</NuGetSourceType>
+			</ReferenceCopyLocalPaths>
+		</ItemGroup>
+	</Target>
 
 	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
 		<ItemGroup>

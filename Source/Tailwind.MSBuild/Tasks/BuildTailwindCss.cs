@@ -1,4 +1,5 @@
 using Microsoft.Build.Framework;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -19,19 +20,25 @@ namespace Tailwind.MSBuild.Tasks
 		///		The full path to the standalone-cli executable.
 		/// </summary>
 		[Required]
-        public string StandaloneCliPath { get; set; }
+		public string StandaloneCliPath { get; set; }
+
+		/// <summary>
+		///		The name of the file containing the tailwind configuration.
+		/// </summary>
+		[Required]
+		public string TailwindConfigFile { get; set; }
 
 		/// <summary>
 		///     The file name of the input css file.
 		/// </summary>
 		[Required]
-        public string InputFile { get; set; }
+        public string InputFileName { get; set; }
 
 		/// <summary>
-		///     The file path where the output will be located.
+		///     The file path where the output css will be located.
 		/// </summary>
 		[Required]
-        public string OutputFile { get; set; }
+        public string OutputFilePath { get; set; }
 
 		/// <summary>
 		///     Whether the generated css should be minified or not.
@@ -40,7 +47,7 @@ namespace Tailwind.MSBuild.Tasks
         public bool Minify { get; set; }
 
 		/// <summary>
-		///     The file name where the css was generated.
+		///     The absolute path to the file where the css was generated.
 		/// </summary>
 		[Output]
         public string GeneratedCssFile { get; set; }
@@ -49,43 +56,50 @@ namespace Tailwind.MSBuild.Tasks
 		///     Builds tailwindcss for the current project.
 		/// </summary>
 		public override bool Execute()
-        {
-            if (!File.Exists(Path.Combine(TailwindConfigDir, "tailwind.config.js")))
+		{
+			TailwindConfigDir = Path.GetFullPath(TailwindConfigDir);
+			Directory.CreateDirectory(TailwindConfigDir);
+
+			if (!File.Exists(Path.Combine(TailwindConfigDir, TailwindConfigFile)))
+				RunCli("init --full");
+
+			if (!File.Exists(Path.Combine(TailwindConfigDir, InputFileName)))
+				using (var file = File.CreateText(Path.Combine(TailwindConfigDir, InputFileName)))
+				{
+					file.WriteLine("@tailwind base;");
+					file.WriteLine("@tailwind components;");
+					file.WriteLine("@tailwind utilities;");
+
+					file.Close();
+				}
+
+			RunCli($"-i {InputFileName} -o {OutputFilePath}{(Minify ? " -m" : string.Empty)}");
+					
+            return !Log.HasLoggedErrors;
+        }
+
+		private void RunCli(string args)
+		{
+			using (var process = new Process
 			{
-				var init = new ProcessStartInfo
+				StartInfo = new ProcessStartInfo
 				{
 					WorkingDirectory = TailwindConfigDir,
 					FileName = StandaloneCliPath,
-					Arguments = "init",
-					CreateNoWindow = true
-				};
-
-				var initProc = Process.Start(init);
-				initProc.WaitForExit();
-
-				if (initProc.ExitCode != 0)
-				{
-					Log.LogError($"Failed to initialize a new tailwindcss project. Process exited with status code {initProc.ExitCode}");
+					Arguments = args,
+					CreateNoWindow = true,
+					UseShellExecute = false,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
 				}
+			})
+			{
+				process.ErrorDataReceived += (sender, e) => { Log.LogError(e.Data); };
+				process.OutputDataReceived += (sender, e) => { Log.LogMessage(e.Data); };
+
+				process.Start();
+				process.WaitForExit();
 			}
-
-            var build = new ProcessStartInfo
-            {
-                WorkingDirectory = TailwindConfigDir,
-                FileName = StandaloneCliPath,
-                Arguments = $"-i {InputFile} -o {OutputFile}{(Minify ? " -m" : string.Empty )}",
-                CreateNoWindow = true
-            };
-
-            var buildProc = Process.Start(build);
-			buildProc.WaitForExit();
-
-            if (buildProc.ExitCode != 0)
-            {
-                Log.LogError($"Failed to build tailwindcss. Process exited with status code {buildProc.ExitCode}");
-            }
-
-            return !Log.HasLoggedErrors;
-        }
+		}
     }
 }

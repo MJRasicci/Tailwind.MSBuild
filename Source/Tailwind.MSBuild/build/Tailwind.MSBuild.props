@@ -1,31 +1,24 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		
 	<PropertyGroup>
-		<!-- The folder inside the NuGet package where the custom tasks will be located -->
 		<CustomTasksFolder>$(MSBuildThisFileDirectory)..\lib\netstandard2.0</CustomTasksFolder>
-		<!-- Reference to the assembly which contains the MSBuild Tasks -->
 		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
 	</PropertyGroup>
 
 	<!-- Register our custom tasks -->
 	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
-	<UsingTask TaskName="Tailwind.MSBuild.Tasks.EnsureTailwindStandaloneCli" AssemblyFile="$(CustomTasksAssembly)"/>
+	<UsingTask TaskName="Tailwind.MSBuild.Tasks.InitializeTailwind" AssemblyFile="$(CustomTasksAssembly)"/>
 
-	<!-- Task parameters default values, these can be overridden -->
-	<PropertyGroup>
+	<PropertyGroup Label="Tailwind Parameters">
 		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
-		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(BaseIntermediateOutputPath)</TailwindInstallPath>
-		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDir)Tailwind\</TailwindConfigDir>
-		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">input.css</TailwindInputFile>
-		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDir)wwwroot\css\tailwind.css</TailwindOutputFile>
+		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
+		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
+		<TailwindConfigFile Condition="'$(TailwindConfigFile)' == ''">tailwind.config.js</TailwindConfigFile>
+		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
+		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
 	</PropertyGroup>
-
-	<!-- Exclude tailwind config files from the rest of the build process -->
-	<ItemGroup>
-		<None Include="$(TailwindConfigDir)**\*" />
-	</ItemGroup>
 	
 </Project>

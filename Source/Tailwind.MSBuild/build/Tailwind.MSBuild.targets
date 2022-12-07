@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<!-- Build TailwindCSS -->
 	<Target Name="BeforeCompile" Outputs="$(GeneratedCssFile)">
-		<!-- Ensure tailwind standalone-cli is available -->
-		<InitializeTailwind Version="$(TailwindVersion)"
-									 RootInstallPath="$(TailwindInstallPath)">
+		<InitializeTailwind Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
 			<Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
 		</InitializeTailwind>
 

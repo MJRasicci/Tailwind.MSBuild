@@ -8,6 +8,10 @@
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).UnitTests" />
+  </ItemGroup>
+  
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.4.0" PrivateAssets="all" />
 		<PackageReference Include="System.Text.Json" Version="7.0.0" PrivateAssets="all" />
@@ -17,17 +21,12 @@
 		<Content Include="build\Tailwind.MSBuild.props" PackagePath="build\" />
 		<Content Include="build\Tailwind.MSBuild.targets" PackagePath="build\" />
 	</ItemGroup>
-	
-	<Target Name="_SetNuGetSourceTypeToCopyLocal" AfterTargets="ResolveReferences">
+
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
 		<ItemGroup>
 			<ReferenceCopyLocalPaths Update="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''">
 				<NuGetSourceType>Package</NuGetSourceType>
 			</ReferenceCopyLocalPaths>
-		</ItemGroup>
-	</Target>
-
-	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
-		<ItemGroup>
 			<BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
 		</ItemGroup>
 	</Target>

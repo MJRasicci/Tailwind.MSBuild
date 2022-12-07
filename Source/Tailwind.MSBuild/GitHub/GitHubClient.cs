@@ -53,7 +53,7 @@ namespace Tailwind.MSBuild.GitHub
         /// </returns>
         public async Task<TailwindRelease> GetLatestReleaseAsync()
         {
-            var response = await this.client.GetStringAsync("https://api.github.com/repos/MJRasicci/tailwindcss/releases/latest");
+            var response = await this.client.GetStringAsync("https://api.github.com/repos/mjrasicci/tailwindcss/releases/latest");
             return JsonSerializer.Deserialize<TailwindRelease>(response);
         }
 
@@ -65,12 +65,12 @@ namespace Tailwind.MSBuild.GitHub
         /// </returns>
         public async Task<TailwindRelease> GetReleaseAsync(string tag)
         {
-            var response = await this.client.GetStringAsync($"https://api.github.com/repos/MJRasicci/tailwindcss/releases/tags/{tag}");
+            var response = await this.client.GetStringAsync($"https://api.github.com/repos/mjrasicci/tailwindcss/releases/tags/{tag}");
             return JsonSerializer.Deserialize<TailwindRelease>(response);
         }
 
         /// <summary>
-        ///     Downloads a <see cref="TailwindAsset" /> and returns an <see cref="ITailwindTool" /> which can be used to invoke the executable.
+        ///     Downloads a <see cref="TailwindAsset" /> to the <paramref name="destinationFilePath"/>.
         /// </summary>
         /// <param name="tailwindDownload">
         ///     The platform specific binary to download.
@@ -81,6 +81,9 @@ namespace Tailwind.MSBuild.GitHub
         public async Task GetAssetAsync(TailwindAsset tailwindDownload, string destinationFilePath)
         {
             var response = await this.client.GetByteArrayAsync(tailwindDownload.DownloadUrl);
+
+            if (File.Exists(destinationFilePath))
+                File.Delete(destinationFilePath);
 
             using (var file = File.OpenWrite(destinationFilePath))
             {

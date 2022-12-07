@@ -6,7 +6,6 @@
 		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
 	</PropertyGroup>
 
-	<!-- Register our custom tasks -->
 	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
 	<UsingTask TaskName="Tailwind.MSBuild.Tasks.InitializeTailwind" AssemblyFile="$(CustomTasksAssembly)"/>
 

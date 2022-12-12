@@ -1,16 +1,15 @@
 namespace Tailwind.MSBuild.UnitTests;
 
-using Moq;
 using Xunit;
 using FluentAssertions;
 using Tailwind.MSBuild.UnitTests.Common;
 using Tailwind.MSBuild.GitHub;
 
-public class GithubClientTests : IClassFixture<GithubClientFixture>
+public class GitHubClientTests : IClassFixture<GithubClientFixture>
 {
 	private readonly GithubClientFixture fixture;
 
-	public GithubClientTests(GithubClientFixture fixture)
+	public GitHubClientTests(GithubClientFixture fixture)
 	{
 		this.fixture = fixture;
 	}

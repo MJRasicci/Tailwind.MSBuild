@@ -1,22 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.Json;
 using Microsoft.Build.Framework;
 using Tailwind.MSBuild.GitHub;
 
 namespace Tailwind.MSBuild.Tasks
 {
-	/// <summary>
-	///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine and a configuration exists.
-	/// </summary>
-	public class InitializeTailwind : Microsoft.Build.Utilities.Task
+    /// <summary>
+    ///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine and a configuration exists.
+    /// </summary>
+    public class InitializeTailwind : Microsoft.Build.Utilities.Task
 	{
 		/// <summary>
 		///		The version tag of the tailwind release to use, defaults to "latest" for the most current release.
@@ -41,37 +35,37 @@ namespace Tailwind.MSBuild.Tasks
 		/// </summary>
 		public override bool Execute()
 		{
-			StandaloneCliPath = GetPathToExecutable();
+			this.StandaloneCliPath = GetPathToExecutable();
 
-			if (Log.HasLoggedErrors)
+			if (this.Log.HasLoggedErrors)
 				return false;
-			else if (File.Exists(StandaloneCliPath))
+			else if (File.Exists(this.StandaloneCliPath))
 				return true;
 
-			Directory.CreateDirectory(Path.Combine(RootInstallPath, Version));
+			Directory.CreateDirectory(Path.Combine(this.RootInstallPath, this.Version));
 
 			try
 			{
 				using (var client = new GitHubClient())
 				{
-					var release = (Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(Version)).GetAwaiter().GetResult();
-					var asset = release.Assets.FirstOrDefault(a => a.Name.Equals(Path.GetFileName(StandaloneCliPath), StringComparison.OrdinalIgnoreCase));
+					var release = (this.Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(this.Version)).GetAwaiter().GetResult();
+					var asset = release.Assets.FirstOrDefault(a => a.Name.Equals(Path.GetFileName(this.StandaloneCliPath), StringComparison.OrdinalIgnoreCase));
 
 					if (asset != null)
 					{
-						client.GetAssetAsync(asset, StandaloneCliPath).GetAwaiter().GetResult();
+						client.GetAssetAsync(asset, this.StandaloneCliPath).GetAwaiter().GetResult();
 
-						if (!File.Exists(StandaloneCliPath))
-							Log.LogError($"Unable to download '{asset.Name}' to '{StandaloneCliPath}'");
+						if (!File.Exists(this.StandaloneCliPath))
+                            this.Log.LogError($"Unable to download '{asset.Name}' to '{this.StandaloneCliPath}'");
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Log.LogErrorFromException(ex);
+                this.Log.LogErrorFromException(ex);
 			}
 
-            return !Log.HasLoggedErrors;
+            return !this.Log.HasLoggedErrors;
         }
 
 		private string GetPathToExecutable()
@@ -85,7 +79,7 @@ namespace Tailwind.MSBuild.Tasks
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				fileName = $"tailwindcss-windows-{RuntimeInformation.ProcessArchitecture}.exe";
 
-			return Path.GetFullPath(Path.Combine(RootInstallPath, Version, fileName.ToLower()));
+			return Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName.ToLower()));
 		}
 	}
 }

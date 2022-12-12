@@ -1,5 +1,4 @@
 using Microsoft.Build.Framework;
-using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -57,14 +56,15 @@ namespace Tailwind.MSBuild.Tasks
 		/// </summary>
 		public override bool Execute()
 		{
-			TailwindConfigDir = Path.GetFullPath(TailwindConfigDir);
-			Directory.CreateDirectory(TailwindConfigDir);
+            this.TailwindConfigDir = Path.GetFullPath(this.TailwindConfigDir);
+			Directory.CreateDirectory(this.TailwindConfigDir);
 
-			if (!File.Exists(Path.Combine(TailwindConfigDir, TailwindConfigFile)))
+			if (!File.Exists(Path.Combine(this.TailwindConfigDir, this.TailwindConfigFile)))
 				RunCli("init --full");
 
-			if (!File.Exists(Path.Combine(TailwindConfigDir, InputFileName)))
-				using (var file = File.CreateText(Path.Combine(TailwindConfigDir, InputFileName)))
+            if (!File.Exists(Path.Combine(this.TailwindConfigDir, this.InputFileName)))
+            {
+                using (var file = File.CreateText(Path.Combine(this.TailwindConfigDir, this.InputFileName)))
 				{
 					file.WriteLine("@tailwind base;");
 					file.WriteLine("@tailwind components;");
@@ -72,10 +72,11 @@ namespace Tailwind.MSBuild.Tasks
 
 					file.Close();
 				}
+            }
 
-			RunCli($"-i {InputFileName} -o {OutputFilePath}{(Minify ? " -m" : string.Empty)}");
+            RunCli($"-i {this.InputFileName} -o {this.OutputFilePath}{(this.Minify ? " -m" : string.Empty)}");
 					
-            return !Log.HasLoggedErrors;
+            return !this.Log.HasLoggedErrors;
         }
 
 		private void RunCli(string args)
@@ -84,8 +85,8 @@ namespace Tailwind.MSBuild.Tasks
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					WorkingDirectory = TailwindConfigDir,
-					FileName = StandaloneCliPath,
+					WorkingDirectory = this.TailwindConfigDir,
+					FileName = this.StandaloneCliPath,
 					Arguments = args,
 					CreateNoWindow = true,
 					UseShellExecute = false,
@@ -94,8 +95,8 @@ namespace Tailwind.MSBuild.Tasks
 				}
 			})
 			{
-				process.ErrorDataReceived += (sender, e) => { Log.LogError(e.Data); };
-				process.OutputDataReceived += (sender, e) => { Log.LogMessage(e.Data); };
+				process.ErrorDataReceived += (sender, e) => this.Log.LogError(e.Data);
+				process.OutputDataReceived += (sender, e) => this.Log.LogMessage(e.Data);
 
 				process.Start();
 				process.WaitForExit();

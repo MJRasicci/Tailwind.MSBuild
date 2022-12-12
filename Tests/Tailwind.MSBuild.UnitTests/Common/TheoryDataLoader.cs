@@ -1,7 +1,6 @@
 namespace Tailwind.MSBuild.UnitTests.Common;
 
 using System.Reflection;
-using Tailwind.MSBuild.GitHub;
 using Xunit;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]

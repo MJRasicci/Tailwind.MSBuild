@@ -1,10 +1,49 @@
-﻿namespace Tailwind.MSBuild.UnitTests;
+namespace Tailwind.MSBuild.UnitTests;
 
 using Moq;
+using Tailwind.MSBuild.UnitTests.Common;
+using Tasks;
+using Xunit;
 
-public class InitializeTailwindTests
+public class InitializeTailwindTests : IClassFixture<TaskFixture<InitializeTailwind>>
 {
-	private Mock<IBuildEngine> BuildEngine { get; set; } = null!;
+    private readonly TaskFixture<InitializeTailwind> fixture;
 
-	private List<BuildErrorEventArgs> Errors { get; set; } = null!;
+    public InitializeTailwindTests(TaskFixture<InitializeTailwind> fixture)
+    {
+        this.fixture = fixture;
+    }
+
+    [Fact]
+    public void Execute_LatestSucceeds()
+    {
+        var task = this.fixture.Prepare(t =>
+        {
+            t.Version = "latest";
+            t.RootInstallPath = Directory.GetCurrentDirectory();
+        });
+    }
+
+    [Fact]
+    public void Execute_VersionLockSucceeds()
+    {
+        var task = this.fixture.Prepare(t =>
+        {
+            t.Version = "v3.2.4";
+            t.RootInstallPath = Directory.GetCurrentDirectory();
+        });
+    }
+
+    [Fact]
+    public void Execute_UsesCache()
+    {
+        var task = this.fixture.Prepare(t =>
+        {
+            t.Version = "v3.2.4";
+            t.RootInstallPath = Directory.GetCurrentDirectory();
+        });
+    }
+
+    [Fact]
+    public void Execute_LogsExceptions() { }
 }

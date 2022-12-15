@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		
 	<PropertyGroup>
@@ -6,11 +6,12 @@
 		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
 	</PropertyGroup>
 
+  <UsingTask TaskName="Tailwind.MSBuild.Tasks.InitializeTailwind" AssemblyFile="$(CustomTasksAssembly)"/>
 	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
-	<UsingTask TaskName="Tailwind.MSBuild.Tasks.InitializeTailwind" AssemblyFile="$(CustomTasksAssembly)"/>
 
-	<PropertyGroup Label="Tailwind Parameters">
+	<PropertyGroup Label="Tailwind Properties">
 		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
+    <!-- This sets the default install path to be within the Tailwind.MSBuild subdirectory in your nuget package cache -->
 		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
 		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
 		<TailwindConfigFile Condition="'$(TailwindConfigFile)' == ''">tailwind.config.js</TailwindConfigFile>

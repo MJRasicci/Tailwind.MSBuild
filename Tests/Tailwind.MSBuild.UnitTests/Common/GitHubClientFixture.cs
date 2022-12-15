@@ -2,13 +2,13 @@ namespace Tailwind.MSBuild.UnitTests.Common;
 
 using Tailwind.MSBuild.GitHub;
 
-public class GithubClientFixture : IDisposable
+public class GitHubClientFixture : IDisposable
 {
 	private bool disposed;
 
 	internal GitHubClient Client { get; private set; }
 
-    public GithubClientFixture()
+    public GitHubClientFixture()
 	{
 		this.Client = new GitHubClient();
 	}
@@ -20,13 +20,12 @@ public class GithubClientFixture : IDisposable
     }
 
     protected virtual void Dispose(bool disposing)
-	{
-		if (!this.disposed)
-		{
-			if (disposing)
-				this.Client.Dispose();
+    {
+        if (this.disposed) return;
 
-			this.disposed = true;
-		}
-	}
+        if (disposing)
+            this.Client.Dispose();
+
+        this.disposed = true;
+    }
 }

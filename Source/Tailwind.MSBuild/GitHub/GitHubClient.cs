@@ -1,13 +1,5 @@
 namespace Tailwind.MSBuild.GitHub;
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-
 /// <summary>
 ///     Provides a basic client to download the Tailwind Standalone CLI from Github.
 /// </summary>

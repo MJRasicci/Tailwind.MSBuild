@@ -1,11 +1,6 @@
 namespace Tailwind.MSBuild.Tests.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Moq;
-using Tailwind.MSBuild.GitHub;
 
 public class TaskFixture<T> where T : Microsoft.Build.Utilities.Task, new()
 {

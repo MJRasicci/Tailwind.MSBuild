@@ -1,19 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<Target Name="BeforeCompile" Outputs="$(GeneratedCssFile)">
-		<InitializeTailwind Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
-			<Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
-		</InitializeTailwind>
+  <Target Name="BeforeCompile" Outputs="$(GeneratedCssFile)">
+    <SetupTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
+      <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
+    </SetupTailwindCLI>
 
-		<BuildTailwindCss TailwindConfigDir="$(TailwindConfigDir)"
-						  StandaloneCliPath="$(StandaloneCliPath)"
-						  TailwindConfigFile="$(TailwindConfigFile)"
-						  InputFileName="$(TailwindInputFile)"
-						  OutputFilePath="$(TailwindOutputFile)"
-						  Minify="$(TailwindMinify)">
-			<Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
-		</BuildTailwindCss>
-	</Target>
-	
+    <BuildTailwindCSS TailwindConfigDir="$(TailwindConfigDir)"
+                      StandaloneCliPath="$(StandaloneCliPath)"
+                      TailwindConfigFile="$(TailwindConfigFile)"
+                      InputFile="$(TailwindInputFile)"
+                      OutputFile="$(TailwindOutputFile)"
+                      Minify="$(TailwindMinify)">
+      <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
+    </BuildTailwindCSS>
+  </Target>
+  
 </Project>

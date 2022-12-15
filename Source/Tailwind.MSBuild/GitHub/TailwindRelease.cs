@@ -1,9 +1,5 @@
 namespace Tailwind.MSBuild.GitHub;
 
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
 /// <summary>
 ///     A lightweight response model for the GitHub Releases API.
 /// </summary>

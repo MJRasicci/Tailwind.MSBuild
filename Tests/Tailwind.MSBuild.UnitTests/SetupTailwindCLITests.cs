@@ -1,15 +1,14 @@
 namespace Tailwind.MSBuild.Tests;
 
-using Moq;
-using Tailwind.MSBuild.Tests.Common;
-using Tasks;
 using Xunit;
+using Tailwind.MSBuild.Tests.Common;
+using Tailwind.MSBuild.Tasks;
 
-public class InitializeTailwindTests : IClassFixture<TaskFixture<InitializeTailwind>>
+public class SetupTailwindCLITests : IClassFixture<TaskFixture<SetupTailwindCLI>>
 {
-    private readonly TaskFixture<InitializeTailwind> fixture;
+    private readonly TaskFixture<SetupTailwindCLI> fixture;
 
-    public InitializeTailwindTests(TaskFixture<InitializeTailwind> fixture)
+    public SetupTailwindCLITests(TaskFixture<SetupTailwindCLI> fixture)
     {
         this.fixture = fixture;
     }

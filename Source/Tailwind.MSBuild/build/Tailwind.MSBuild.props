@@ -6,8 +6,8 @@
 		<CustomTasksAssembly>$(CustomTasksFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
 	</PropertyGroup>
 
-  <UsingTask TaskName="Tailwind.MSBuild.Tasks.InitializeTailwind" AssemblyFile="$(CustomTasksAssembly)"/>
-	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCss" AssemblyFile="$(CustomTasksAssembly)"/>
+  <UsingTask TaskName="Tailwind.MSBuild.Tasks.SetupTailwindCLI" AssemblyFile="$(CustomTasksAssembly)"/>
+	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCSS" AssemblyFile="$(CustomTasksAssembly)"/>
 
 	<PropertyGroup Label="Tailwind Properties">
 		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>

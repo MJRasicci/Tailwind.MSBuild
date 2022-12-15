@@ -1,7 +1,5 @@
 namespace Tailwind.MSBuild.GitHub;
 
-using System.Text.Json.Serialization;
-
 /// <summary>
 ///     A small model containing the download information for a release asset.
 /// </summary>

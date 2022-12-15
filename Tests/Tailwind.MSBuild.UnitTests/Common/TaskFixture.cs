@@ -1,4 +1,4 @@
-namespace Tailwind.MSBuild.UnitTests.Common;
+namespace Tailwind.MSBuild.Tests.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using Tailwind.MSBuild.GitHub;
 public class TaskFixture<T> where T : Microsoft.Build.Utilities.Task, new()
 {
     public Mock<IBuildEngine> BuildEngine { get; }
-    
+
     public List<BuildErrorEventArgs> Errors { get; }
 
     public TaskFixture()

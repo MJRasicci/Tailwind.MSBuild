@@ -1,7 +1,7 @@
-namespace Tailwind.MSBuild.UnitTests;
+namespace Tailwind.MSBuild.Tests;
 
 using Moq;
-using Tailwind.MSBuild.UnitTests.Common;
+using Tailwind.MSBuild.Tests.Common;
 using Tasks;
 using Xunit;
 

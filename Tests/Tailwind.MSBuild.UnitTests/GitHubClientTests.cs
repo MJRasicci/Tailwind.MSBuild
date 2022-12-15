@@ -1,26 +1,26 @@
-namespace Tailwind.MSBuild.UnitTests;
+namespace Tailwind.MSBuild.Tests;
 
 using Xunit;
 using FluentAssertions;
-using Tailwind.MSBuild.UnitTests.Common;
 using Tailwind.MSBuild.GitHub;
+using Tailwind.MSBuild.Tests.Common;
 
 public class GitHubClientTests : IClassFixture<GitHubClientFixture>
 {
-	private readonly GitHubClientFixture fixture;
+    private readonly GitHubClientFixture fixture;
 
-	public GitHubClientTests(GitHubClientFixture fixture)
-	{
-		this.fixture = fixture;
-	}
+    public GitHubClientTests(GitHubClientFixture fixture)
+    {
+        this.fixture = fixture;
+    }
 
-	[Fact]
-	public async Task GetLatestReleaseAsync_Succeeds()
-	{
-		var release = await this.fixture.Client.GetLatestReleaseAsync();
-		release.Should().NotBeNull();
-		release?.Assets.Should().NotBeNullOrEmpty();
-	}
+    [Fact]
+    public async Task GetLatestReleaseAsync_Succeeds()
+    {
+        var release = await this.fixture.Client.GetLatestReleaseAsync();
+        release.Should().NotBeNull();
+        release?.Assets.Should().NotBeNullOrEmpty();
+    }
 
     [Fact]
     public async Task GetReleaseAsync_Succeeds()

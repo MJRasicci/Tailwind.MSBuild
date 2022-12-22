@@ -1,4 +1,10 @@
-<a name="readme-top"></a>
+<div align="center">
+
+# Tailwind.MSBuild
+
+Tailwind CSS Integration for .NET Projects
+
+<br />
 
 <!-- PROJECT SHIELDS -->
 [![Contributors][contributors-shield]][contributors-url]
@@ -7,128 +13,172 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-<!-- PROJECT TITLE -->
-<div align="center">
-  <h3 align="center">Tailwind.MSBuild</h3>
-
-  <p align="center">
-    TailwindCSS Integration for .NET Projects
-    <br />
-    <a href="https://github.com/mjrasicci/tailwind.msbuild/wiki"><strong>Explore the docs »</strong></a>
-  </p>
+<hr />
 </div>
 
-<!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#basic-use">Basic Use</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#customize-your-build">Customize Your Build</a></li>
+    <ul>
+        <li><a href="#setting-build-properties">Setting Build Properties</a></li>
+        <li><a href="#executing-tasks">Executing Tasks</a></li>
+    </ul>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Tailwind.MSBuild simplifies invoking the TailwindCSS CLI within your build process. It implements MSBuild tasks that download the TailwindCSS Standalone CLI tool from GitHub and run the tool to generate CSS at compile time. No `package.json` or adding build targets to your project file needed.
-
-### Built With
-
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
-* TailwindCSS
-* .NET
+Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It uses the [Tailwind Standalone CLI][tailwind-cli] so there are no external dependencies and you do not have to have npm installed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
 ## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/mjrasicci/tailwind.msbuild.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+Use your preferred method of managing NuGet packages, such as the NuGet Package Manager within Visual Studio, or one of the following methods:
+
+<ol>
+<details>
+<summary>Visual Studio</summary>
+
+Install Tailwind.MSBuild using the NuGet Package Manager or with the following command in the Package Manager Console:
+
+```
+PM> Install-Package Tailwind.MSBuild
+```
+
+</details>
+<details>
+<summary>.NET CLI</summary>
+
+You can add a package reference using the following command when the .NET CLI is available:
+
+```
+> dotnet add package Tailwind.MSBuild
+```
+
+</details>
+<details>
+<summary>Manually Edit Your .csproj File</summary>
+
+> Note: You will need to build your project once in order to create the initial configuration when using this method.
+
+You can manually add the following line to your `.csproj` file within an `ItemGroup`:
+
+```
+<PackageReference Include="Tailwind.MSBuild" Version="1.*" />
+```
+
+</details>
+</ol>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE EXAMPLES -->
-## Usage
+### Basic Use
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Once installed, you can customize Tailwind by modifying the `tailwind.config.js` and `tailwind.input.css` files in your configuration directory which defaults to `$(MSBuildProjectDirectory)\Properties\`. If the directory or either file does not exist, a default will be created for you the next time you build your project. For detailed instructions on configuring Tailwind CSS, see the official [Configuration][tailwind-docs] guide.
 
-_For more advanced examples, please refer to the [Documentation](https://github.com/mjrasicci/tailwind.msbuild/wiki)_
+Each time you build your project, a css file will be generated at `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css`. You can also customize your input and output file paths. For example, to set your input file to "src/styles/tailwind.css" and your output file to "wwwroot/css/tailwind.css", you can add the following to your .csproj file:
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- Features -->
-## Features
-
-- [X] Shared CLI install path
-- [X] User-defined tailwind version
-- [X] Initialize tailwind configuration
-- [ ] Customizable paths
-- [ ] Support Hot Reload
-    - [ ] Nested Feature
-
-See the [open issues](https://github.com/mjrasicci/tailwind.msbuild/issues) for a full list of proposed features (and known issues).
+```
+<PropertyGroup Label="Tailwind Properties">
+	<TailwindInputFile>$(MSBuildProjectDirectory)\src\styles\tailwind.css</TailwindInputFile>
+	<TailwindOutputFile>$(MSBuildProjectDirectory)\wwwroot\css\site.css</TailwindOutputFile>
+</PropertyGroup>
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- CONTRIBUTING -->
-## Contributing
+## Customize Your Build
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+### Setting Build Properties
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+If you want to change any of the default settings Tailwind.MSBuild uses, you can override them by setting any of the following properties in your `.csproj` file.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+| MSBuild Property Name | Default Value                                         | Description                                                |
+|-----------------------|-------------------------------------------------------|------------------------------------------------------------|
+| TailwindVersion       | `latest`                                              | The version tag of the tailwind release to use.            |
+| TailwindInstallPath   | `$(MSBuildThisFileDirectory)..\..\cli\`               | The directory where the tailwindcss cli should be located. |
+| TailwindConfigDir     | `$(MSBuildProjectDirectory)\Properties\`              | The directory containing the tailwind configuration files. |
+| TailwindConfigFile    | `tailwind.config.js`                                  | The name of the tailwind configuration file.               |
+| TailwindInputFile     | `tailwind.input.css`                                  | The name of the input css file.                            |
+| TailwindOutputFile    | `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css` | The path where the output css file will be located.        |
+| TailwindMinify        | `false` for Debug builds, `true` for Release builds   | Whether the generated css should be minified or not.       |
+
+>### ⚠️ *A note about `TailwindInstallPath`*:
+> For the default install path, `$(MSBuildThisFileDirectory)` expands to the directory where [Tailwind.MSBuild.props][tailwind-msbuild-props] was extracted to. This means the default value of `TailwindInstallPath` is the equivilant of `{NuGetPackageCache}\tailwind.msbuild\cli\`. 
+
+Here is a sample configuration that overrides every setting.
+
+<ol>
+<details>
+<summary>Sample Config</summary>
+
+```
+<PropertyGroup Label="Tailwind Properties">
+  <!-- Lock Tailwind Version -->
+  <TailwindVersion>v3.2.4</TailwindVersion>
+  <!-- Place Tailwind CLI in obj directory -->
+  <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
+  <!-- Custom input and output file paths -->
+  <TailwindConfigDir>$(MSBuildProjectDirectory)\Tailwind\</TailwindConfigDir>
+  <!-- File names are relative to the TailwindConfigDir unless an absolute path is specified -->
+  <TailwindConfigFile>config.js</TailwindConfigFile>
+  <TailwindInputFile>input.css</TailwindInputFile>
+  <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
+  <!-- Always minify the generated css -->
+  <TailwindMinify>true</TailwindMinify>
+</PropertyGroup>
+```
+
+</details>
+</ol>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Executing Tasks
+
+[Tailwind.MSBuild.targets][tailwind-msbuild-targets] defines a build target named `BuildTailwind` that runs before the `BeforeCompile` target. This target executes two tasks that Tailwind.MSBuild implements. The first task is `GetTailwindCLI` which returns the absolute path to the tailwind CLI to the build engine. The output is stored in a property which is then passed to `BuildTailwindCSS` as the value for the `StandaloneCliPath` parameter.
+
+For advanced scenarios where you need to run the tasks during a different point in the build process, see the tables below for the parameters required for each task and the associated MSBuild Property passed by default. It is recommended to read [Tailwind.MSBuild.targets][tailwind-msbuild-targets] as an example of how to properly invoke the MSBuild tasks.
+
+<ol>
+<details>
+<summary>GetTailwindCLI</summary>
+
+| Task Parameter  | MSBuild Property    |
+|-----------------|---------------------|
+| Version         | TailwindVersion     |
+| RootInstallPath | TailwindInstallPath |
+                
+</details>
+<details>
+<summary>BuildTailwindCSS</summary>
+
+| Task Parameter    | MSBuild Property           |
+|-------------------|----------------------------|
+| StandaloneCliPath | Output of `GetTailwindCLI` |
+| WorkingDir        | TailwindConfigDir          |
+| ConfigFile        | TailwindConfigFile         |
+| InputFile         | TailwindInputFile          |
+| OutputFile        | TailwindOutputFile         |
+| Minify            | TailwindMinify             |
+
+</details>
+</ol>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -149,22 +199,7 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 [issues-url]: https://github.com/mjrasicci/tailwind.msbuild/issues
 [license-shield]: https://img.shields.io/github/license/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
 [license-url]: https://github.com/mjrasicci/tailwind.msbuild/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/mjrasicci
-[product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[tailwind-cli]: https://tailwindcss.com/blog/standalone-cli
+[tailwind-docs]: https://tailwindcss.com/docs/configuration
+[tailwind-msbuild-props]: ./source/Tailwind.MSBuild/build/Tailwind.MSBuild.props
+[tailwind-msbuild-targets]: ./source/Tailwind.MSBuild/build/Tailwind.MSBuild.targets

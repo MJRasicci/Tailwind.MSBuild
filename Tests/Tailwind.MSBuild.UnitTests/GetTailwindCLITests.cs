@@ -4,11 +4,11 @@ using Xunit;
 using Tailwind.MSBuild.Tests.Common;
 using Tailwind.MSBuild.Tasks;
 
-public class SetupTailwindCLITests : IClassFixture<TaskFixture<SetupTailwindCLI>>
+public class GetTailwindCLITests : IClassFixture<TaskFixture<GetTailwindCLI>>
 {
-    private readonly TaskFixture<SetupTailwindCLI> fixture;
+    private readonly TaskFixture<GetTailwindCLI> fixture;
 
-    public SetupTailwindCLITests(TaskFixture<SetupTailwindCLI> fixture)
+    public GetTailwindCLITests(TaskFixture<GetTailwindCLI> fixture)
     {
         this.fixture = fixture;
     }

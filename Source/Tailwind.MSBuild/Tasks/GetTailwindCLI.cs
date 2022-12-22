@@ -3,9 +3,9 @@ namespace Tailwind.MSBuild.Tasks;
 using Tailwind.MSBuild.GitHub;
 
 /// <summary>
-///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine.
+///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine. Outputs the absolute path to the executable.
 /// </summary>
-public class SetupTailwindCLI : Microsoft.Build.Utilities.Task
+public class GetTailwindCLI : Microsoft.Build.Utilities.Task
 {
 	/// <summary>
 	///		The version tag of the tailwind release to use, defaults to "latest" for the most current release.

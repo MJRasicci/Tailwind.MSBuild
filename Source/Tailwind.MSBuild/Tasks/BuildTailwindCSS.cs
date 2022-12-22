@@ -15,13 +15,13 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     ///		The directory containing the tailwind configuration files.
     /// </summary>
     [Required]
-    public string TailwindConfigDir { get; set; } = string.Empty;
+    public string ConfigDir { get; set; } = string.Empty;
 
     /// <summary>
     ///		The name of the tailwind configuration file.
     /// </summary>
     [Required]
-	public string TailwindConfigFile { get; set; } = string.Empty;
+	public string ConfigFile { get; set; } = string.Empty;
 
     /// <summary>
     ///     The name of the input css file.
@@ -53,13 +53,13 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     public override bool Execute()
 	{
         // Init
-        if (!File.Exists(this.TailwindConfigFile))
+        if (!File.Exists(Path.Combine(this.ConfigDir, this.ConfigFile)))
         {
-            Directory.CreateDirectory(this.TailwindConfigDir);
-            RunCli("init --postcss --full");
+            Directory.CreateDirectory(this.ConfigDir);
+            RunCli($"init {this.ConfigFile} --postcss --full");
         }
 
-        this.InputFile = Path.Combine(this.TailwindConfigDir, this.InputFile);
+        this.InputFile = Path.Combine(this.ConfigDir, this.InputFile);
 
         if (!File.Exists(this.InputFile))
         {
@@ -73,7 +73,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         }
 
         // Build
-        RunCli($"-c {this.TailwindConfigFile} -i {this.InputFile} -o {this.OutputFile}{(this.Minify ? " -m" : string.Empty)}");
+        RunCli($"-c {this.ConfigFile} -i {this.InputFile} -o {this.OutputFile}{(this.Minify ? " -m" : string.Empty)}");
 
         return !this.Log.HasLoggedErrors;
     }
@@ -85,7 +85,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         {
             StartInfo = new ProcessStartInfo
             {
-                WorkingDirectory = TailwindConfigDir,
+                WorkingDirectory = ConfigDir,
                 FileName = this.StandaloneCliPath,
                 Arguments = args,
                 CreateNoWindow = true,

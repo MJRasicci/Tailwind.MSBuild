@@ -201,5 +201,5 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 [license-url]: https://github.com/mjrasicci/tailwind.msbuild/blob/master/LICENSE.txt
 [tailwind-cli]: https://tailwindcss.com/blog/standalone-cli
 [tailwind-docs]: https://tailwindcss.com/docs/configuration
-[tailwind-msbuild-props]: ./source/Tailwind.MSBuild/build/Tailwind.MSBuild.props
-[tailwind-msbuild-targets]: ./source/Tailwind.MSBuild/build/Tailwind.MSBuild.targets
+[tailwind-msbuild-props]: ./Source/Tailwind.MSBuild/build/Tailwind.MSBuild.props
+[tailwind-msbuild-targets]: ./Source/Tailwind.MSBuild/build/Tailwind.MSBuild.targets

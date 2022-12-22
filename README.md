@@ -41,7 +41,7 @@ Tailwind CSS Integration for .NET Projects
 
 ## About The Project
 
-Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It uses the [Tailwind Standalone CLI][tailwind-cli] so there are no external dependencies and you do not have to have npm installed.
+Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It uses the [Tailwind Standalone CLI][tailwind-cli] so there are no additional dependencies and you do not have to have npm installed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -49,11 +49,9 @@ Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwin
 
 ### Installation
 
-Use your preferred method of managing NuGet packages, such as the NuGet Package Manager within Visual Studio, or one of the following methods:
+Use your preferred method of managing NuGet packages or use one of the following methods:
 
-<ol>
-<details>
-<summary>Visual Studio</summary>
+#### Visual Studio
 
 Install Tailwind.MSBuild using the NuGet Package Manager or with the following command in the Package Manager Console:
 
@@ -61,9 +59,7 @@ Install Tailwind.MSBuild using the NuGet Package Manager or with the following c
 PM> Install-Package Tailwind.MSBuild
 ```
 
-</details>
-<details>
-<summary>.NET CLI</summary>
+#### .NET CLI
 
 You can add a package reference using the following command when the .NET CLI is available:
 
@@ -71,11 +67,7 @@ You can add a package reference using the following command when the .NET CLI is
 > dotnet add package Tailwind.MSBuild
 ```
 
-</details>
-<details>
-<summary>Manually Edit Your .csproj File</summary>
-
-> Note: You will need to build your project once in order to create the initial configuration when using this method.
+#### Manually Edit Your .csproj File
 
 You can manually add the following line to your `.csproj` file within an `ItemGroup`:
 
@@ -83,8 +75,7 @@ You can manually add the following line to your `.csproj` file within an `ItemGr
 <PackageReference Include="Tailwind.MSBuild" Version="1.*" />
 ```
 
-</details>
-</ol>
+> Note: You will need to build your project once in order to create the initial configuration when using this method.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -124,29 +115,22 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 
 Here is a sample configuration that overrides every setting.
 
-<ol>
-<details>
-<summary>Sample Config</summary>
-
 ```
 <PropertyGroup Label="Tailwind Properties">
-  <!-- Lock Tailwind Version -->
-  <TailwindVersion>v3.2.4</TailwindVersion>
-  <!-- Place Tailwind CLI in obj directory -->
-  <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
-  <!-- Custom input and output file paths -->
-  <TailwindConfigDir>$(MSBuildProjectDirectory)\Tailwind\</TailwindConfigDir>
-  <!-- File names are relative to the TailwindConfigDir unless an absolute path is specified -->
-  <TailwindConfigFile>config.js</TailwindConfigFile>
-  <TailwindInputFile>input.css</TailwindInputFile>
-  <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
-  <!-- Always minify the generated css -->
-  <TailwindMinify>true</TailwindMinify>
+    <!-- Lock Tailwind Version -->
+    <TailwindVersion>v3.2.4</TailwindVersion>
+    <!-- Place Tailwind CLI in obj directory -->
+    <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
+    <!-- Custom input and output file paths -->
+    <TailwindConfigDir>$(MSBuildProjectDirectory)\Tailwind\</TailwindConfigDir>
+    <!-- File names are relative to the TailwindConfigDir unless an absolute path is specified -->
+    <TailwindConfigFile>config.js</TailwindConfigFile>
+    <TailwindInputFile>input.css</TailwindInputFile>
+    <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
+    <!-- Always minify the generated css -->
+    <TailwindMinify>true</TailwindMinify>
 </PropertyGroup>
 ```
-
-</details>
-</ol>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -156,18 +140,20 @@ Here is a sample configuration that overrides every setting.
 
 For advanced scenarios where you need to run the tasks during a different point in the build process, see the tables below for the parameters required for each task and the associated MSBuild Property passed by default. It is recommended to read [Tailwind.MSBuild.targets][tailwind-msbuild-targets] as an example of how to properly invoke the MSBuild tasks.
 
-<ol>
-<details>
-<summary>GetTailwindCLI</summary>
+#### GetTailwindCLI
 
 | Task Parameter  | MSBuild Property    |
 |-----------------|---------------------|
 | Version         | TailwindVersion     |
 | RootInstallPath | TailwindInstallPath |
-                
-</details>
-<details>
-<summary>BuildTailwindCSS</summary>
+
+```
+<GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
+    <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
+</GetTailwindCLI>
+```
+
+#### BuildTailwindCSS
 
 | Task Parameter    | MSBuild Property           |
 |-------------------|----------------------------|
@@ -178,8 +164,16 @@ For advanced scenarios where you need to run the tasks during a different point 
 | OutputFile        | TailwindOutputFile         |
 | Minify            | TailwindMinify             |
 
-</details>
-</ol>
+```
+<BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
+                  ConfigDir="$(TailwindConfigDir)"
+                  ConfigFile="$(TailwindConfigFile)"
+                  InputFile="$(TailwindInputFile)"
+                  OutputFile="$(TailwindOutputFile)"
+                  Minify="$(TailwindMinify)">
+    <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
+</BuildTailwindCSS>
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

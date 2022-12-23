@@ -22,6 +22,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailwind.MSBuild.Tests", "Tests\Tailwind.MSBuild.UnitTests\Tailwind.MSBuild.Tests.csproj", "{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E54ADFE4-13DC-4825-A359-FD71FDA95E04}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +50,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{17B479A9-9788-4AD2-9404-5AC6B0966B6D} = {20205D14-6BDB-44D0-B26F-60EC40526D7F}
 		{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59} = {BB8069A9-F68B-4E64-B741-530ABA084AC7}
+		{24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B} = {A5F5A284-7E1A-4584-AD8C-EA4F9D291D1B}
+		{E54ADFE4-13DC-4825-A359-FD71FDA95E04} = {24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90B44879-0FE2-4B66-A18B-B38B71D1C65A}

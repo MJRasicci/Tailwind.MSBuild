@@ -8,6 +8,7 @@ Tailwind CSS Integration for .NET Projects
 <br />
 
 <!-- PROJECT SHIELDS -->
+[![Build Status][build-shield]][build-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -184,6 +185,8 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 <p align="center">Copyright © 2022 Michael Rasicci</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
+[build-shield]: https://img.shields.io/github/actions/workflow/status/mjrasicci/tailwind.msbuild/build.yml?branch=main&logo=github&style=for-the-badge
+[build-url]: https://github.com/mjrasicci/tailwind.msbuild/actions/workflows/build.yml
 [contributors-shield]: https://img.shields.io/github/contributors/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
 [contributors-url]: https://github.com/mjrasicci/tailwind.msbuild/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/mjrasicci/tailwind.msbuild.svg?style=for-the-badge

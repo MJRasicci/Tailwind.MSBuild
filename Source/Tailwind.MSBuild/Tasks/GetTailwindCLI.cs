@@ -65,7 +65,7 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         }
         catch (Exception ex)
         {
-            this.Log.LogErrorFromException(ex);
+            this.Log.LogErrorFromException(ex, true, true, null);
         }
 
         return !this.Log.HasLoggedErrors;

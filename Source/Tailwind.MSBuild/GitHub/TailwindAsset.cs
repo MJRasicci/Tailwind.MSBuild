@@ -22,4 +22,10 @@ internal class TailwindAsset
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     The size of the file.
+    /// </summary>
+    [JsonPropertyName("size")]
+    public ulong Size { get; set; }
 }

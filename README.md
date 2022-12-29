@@ -102,7 +102,7 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 | MSBuild Property Name | Default Value                                         | Description                                                |
 |-----------------------|-------------------------------------------------------|------------------------------------------------------------|
 | TailwindVersion       | `latest`                                              | The version tag of the tailwind release to use.            |
-| TailwindInstallPath   | `$(MSBuildThisFileDirectory)..\..\cli\`               | The directory where the tailwindcss cli should be located. |
+| TailwindInstallPath   | `$(MSBuildThisFileDirectory)..\cli\`                  | The directory where the tailwindcss cli should be located. |
 | TailwindConfigDir     | `$(MSBuildProjectDirectory)\Properties\`              | The directory containing the tailwind configuration files. |
 | TailwindConfigFile    | `tailwind.config.js`                                  | The name of the tailwind configuration file.               |
 | TailwindInputFile     | `tailwind.input.css`                                  | The name of the input css file.                            |
@@ -110,7 +110,7 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 | TailwindMinify        | `false` for Debug builds, `true` for Release builds   | Whether the generated css should be minified or not.       |
 
 >### ⚠️ *A note about `TailwindInstallPath`*:
-> For the default install path, `$(MSBuildThisFileDirectory)` expands to the directory where [Tailwind.MSBuild.props][tailwind-msbuild-props] was extracted to. This means the default value of `TailwindInstallPath` is the equivilant of `{NuGetPackageCache}\tailwind.msbuild\cli\`. 
+> For the default install path, `$(MSBuildThisFileDirectory)` expands to the directory where [Tailwind.MSBuild.props][tailwind-msbuild-props] was extracted to. This means the default value of `TailwindInstallPath` is the equivilant of `{NuGetPackageCache}\tailwind.msbuild\*VERSION*\cli\`. 
 
 Here is a sample configuration that overrides every setting.
 

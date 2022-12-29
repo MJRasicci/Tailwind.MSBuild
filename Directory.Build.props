@@ -14,19 +14,19 @@
 		<Authors>Michael Rasicci</Authors>
 		<Company>mjrasicci.dev</Company>
 		<Product>$(MSBuildProjectName)</Product>
-		<Title>$(MSBuildProjectName)</Title>
+		<PackageId>$(MSBuildProjectName)</PackageId>
 		<Copyright>Copyright © $(Company) $([System.DateTime]::Now.ToString(yyyy))</Copyright>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Versioning">
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
-    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerDefaultPreReleaseIdentifiers>preview</MinVerDefaultPreReleaseIdentifiers>
 		<MinVerVerbosity>normal</MinVerVerbosity>
 	</PropertyGroup>
 
 	<ItemGroup Label="Package References">
-		<PackageReference Include="MinVer" PrivateAssets="all" Version="4.2.0" />
+		<PackageReference Include="MinVer" PrivateAssets="all" Version="4.3.0-beta.1" />
 	</ItemGroup>
 
 </Project>

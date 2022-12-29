@@ -27,3 +27,5 @@ jobs:
       run: dotnet test -c Release --no-build --verbosity normal
     - name: Pack
       run: dotnet pack -c Release --output nupkgs --no-build
+    - name: Push
+      run: dotnet nuget push "nupkgs/*.nupkg" --skip-duplicate --api-key ${{ secrets.CI_PAT }} --source "github"

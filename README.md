@@ -9,9 +9,7 @@ Tailwind CSS Integration for .NET Projects
 
 <!-- PROJECT SHIELDS -->
 [![Build Status][build-shield]][build-url]
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
+[![Downloads][downloads-shield]][downloads-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
@@ -185,15 +183,11 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 <p align="center">Copyright © 2022 Michael Rasicci</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
+[downloads-shield]: https://img.shields.io/github/downloads/mjrasicci/tailwind.msbuild/total?logo=github&style=for-the-badge
+[downloads-url]: https://github.com/MJRasicci?tab=packages&repo_name=Tailwind.MSBuild
 [build-shield]: https://img.shields.io/github/actions/workflow/status/mjrasicci/tailwind.msbuild/build.yml?branch=main&logo=github&style=for-the-badge
 [build-url]: https://github.com/mjrasicci/tailwind.msbuild/actions/workflows/build.yml
-[contributors-shield]: https://img.shields.io/github/contributors/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
-[contributors-url]: https://github.com/mjrasicci/tailwind.msbuild/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
-[forks-url]: https://github.com/mjrasicci/tailwind.msbuild/network/members
-[stars-shield]: https://img.shields.io/github/stars/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
-[stars-url]: https://github.com/mjrasicci/tailwind.msbuild/stargazers
-[issues-shield]: https://img.shields.io/github/issues/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/mjrasicci/tailwind.msbuild.svg?logo=github&style=for-the-badge
 [issues-url]: https://github.com/mjrasicci/tailwind.msbuild/issues
 [license-shield]: https://img.shields.io/github/license/mjrasicci/tailwind.msbuild.svg?style=for-the-badge
 [license-url]: https://github.com/mjrasicci/tailwind.msbuild/blob/master/LICENSE.txt

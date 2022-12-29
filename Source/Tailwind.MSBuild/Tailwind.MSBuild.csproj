@@ -6,9 +6,11 @@
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <DebugType>embedded</DebugType>
     <IsPackable>true</IsPackable>
+    <PackageDescription>Tailwind CSS Integration for .NET Projects</PackageDescription>
+    <RepositoryUrl>https://github.com/mjrasicci/tailwind.msbuild</RepositoryUrl>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Friend Assemblies">
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
   

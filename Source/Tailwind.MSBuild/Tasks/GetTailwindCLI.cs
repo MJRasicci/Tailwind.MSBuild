@@ -47,7 +47,7 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
             var release = (this.Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(this.Version)).GetAwaiter().GetResult();
 
             var asset = (release?.Assets.FirstOrDefault(a => a.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
-                      ?? throw new Exception("Unable to find a TailwindCSS CLI release for the current platform and runtime");
+                      ?? throw new Exception($"Unable to find a download link for '{fileName}' with Tailwind version '{this.Version}'");
 
             var response = client.GetAssetAsync(asset).GetAwaiter().GetResult();
 

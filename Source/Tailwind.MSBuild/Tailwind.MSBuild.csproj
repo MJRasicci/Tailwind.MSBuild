@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDependencyFile>true</GenerateDependencyFile>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <DebugType>embedded</DebugType>
     <IsPackable>true</IsPackable>
     <PackageDescription>Tailwind CSS Integration for .NET Projects</PackageDescription>
@@ -24,18 +24,19 @@
     <Content Include="build\Tailwind.MSBuild.targets" PackagePath="build\" />
   </ItemGroup>
 
-  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Update="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''">
-        <NuGetSourceType>Package</NuGetSourceType>
-      </ReferenceCopyLocalPaths>
-      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
-    </ItemGroup>
-  </Target>
-
   <Target Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput" BeforeTargets="BuiltProjectOutputGroup" Condition="'$(GenerateDependencyFile)' == 'true'">
     <ItemGroup>
       <BuiltProjectOutputGroupOutput Include="$(ProjectDepsFilePath)" TargetPath="$(ProjectDepsFileName)" FinalOutputPath="$(ProjectDepsFilePath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_PackageFiles Include="bin\$(Configuration)\*\System.Text.Json.dll">
+        <PackagePath>$(BuildOutputTargetFolder)\%(RecursiveDir)</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
     </ItemGroup>
   </Target>
 

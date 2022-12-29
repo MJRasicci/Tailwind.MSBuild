@@ -21,7 +21,7 @@
 	<PropertyGroup Label="Versioning">
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
-    <MinVerDefaultPreReleaseIdentifiers>preview</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
 		<MinVerVerbosity>normal</MinVerVerbosity>
 	</PropertyGroup>
 

@@ -25,5 +25,7 @@ jobs:
       run: dotnet build -c Release --no-restore
     - name: Pack
       run: dotnet pack -c Release --output nupkgs --no-build
+    - name: Authenticate
+      run: dotnet nuget add source --username mjrasicci --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/mjrasicci/index.json"
     - name: Push
       run: dotnet nuget push "nupkgs/*.nupkg" --skip-duplicate --api-key ${{ secrets.CI_PAT }} --source "github"

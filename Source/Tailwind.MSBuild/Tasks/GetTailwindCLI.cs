@@ -38,7 +38,9 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
                          : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{ProcessorArchitecture.CurrentProcessArchitecture}.exe"
                          : throw new Exception("Unable to detect the proper platform and runtime for TailwindCSS");
 
-            this.StandaloneCliPath = Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName.ToLower()));
+            fileName = fileName.ToLower();
+
+            this.StandaloneCliPath = Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName));
 
             Directory.CreateDirectory(Path.GetDirectoryName(this.StandaloneCliPath));
 

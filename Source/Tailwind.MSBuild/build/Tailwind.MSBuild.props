@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <TailwindMSBuildAssemblyDir>$(MSBuildThisFileDirectory)..\lib\netstandard2.0</TailwindMSBuildAssemblyDir>
+    <TailwindMSBuildAssemblyDir>$(MSBuildThisFileDirectory)..\tasks\netstandard2.0</TailwindMSBuildAssemblyDir>
     <TailwindMSBuildAssembly>$(TailwindMSBuildAssemblyDir)\$(MSBuildThisFileName).dll</TailwindMSBuildAssembly>
   </PropertyGroup>
   

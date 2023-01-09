@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+        os: [ windows-latest ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -67,7 +67,7 @@ jobs:
   push-nuget:
     name: Push NuGet Package
     needs: build
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && !github.event.release.prerelease
     environment:
       name: "NuGet"
       url: https://www.nuget.org/packages/Tailwind.MSBuild

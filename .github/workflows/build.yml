@@ -47,7 +47,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     environment:
-      name: "Preview"
+      name: "GitHub"
       url: https://github.com/${{ github.repository }}/packages
     permissions:
       packages: write
@@ -58,7 +58,7 @@ jobs:
         with:
           name: "windows-latest"
       - name: Dotnet NuGet Add Source
-        run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --name GitHub --username ${{ github.repository_owner }} --password ${{secrets.GITHUB_TOKEN}}
+        run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --name GitHub --username ${{ github.repository_owner }} --password ${{ secrets.GH_PACKAGES_TOKEN }}
         shell: pwsh
       - name: Dotnet NuGet Push
         run: dotnet nuget push .\*.nupkg --api-key ${{ github.token }} --source GitHub --skip-duplicate

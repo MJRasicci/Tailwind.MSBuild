@@ -1,0 +1,73 @@
+# release-drafter automatically creates a draft release for you each time you complete a PR in the main branch.
+# It uses GitHub labels to categorize changes (See categories) and draft the release.
+# release-drafter also generates a version for your release based on GitHub labels. You can add a label of 'major',
+# 'minor' or 'patch' to determine which number in the version to increment.
+# See https://github.com/release-drafter/release-drafter
+name-template: "$RESOLVED_VERSION"
+tag-template: "$RESOLVED_VERSION"
+prerelease: true
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+  patch:
+    labels:
+      - "patch"
+  default: patch
+autolabeler:
+  - label: 'feature'
+    branch:
+      - '/feature\/.+/'
+  - label: 'enhancement'
+    branch:
+      - '/task\/.+/'
+  - label: 'documentation'
+    branch:
+      - '/docs\/.+/'
+  - label: 'maintenance'
+    branch:
+      - '/\/.+/'
+  - label: 'hotfix'
+    branch:
+      - '/hotfix\/.+/'
+  - label: 'dependencies'
+    branch:
+      - '/dependabot\/.+/'
+categories:
+  - title: "🚀 New Features"
+    labels:
+      - "feature"
+  - title: "✨ Enhancements"
+    labels:
+      - "enhancement"
+  - title: "🛠 Fixes"
+    labels:
+      - "defect"
+      - "bug"
+      - "hotfix"
+  - title: "🧰 Maintenance"
+    labels:
+      - "maintenance"
+      - "refactor"
+      - "cleanup"
+  - title: "📖 Documentation"
+    labels:
+      - "docs"
+      - "documentation"
+  - title: "⬆️ Dependencies"
+    collapse-after: 0
+    labels:
+      - "deps"
+      - "dependencies"
+exclude-labels:
+  - 'skip-changelog'
+no-changes-template: "- No changes"
+change-template: |
+  - $TITLE by @$AUTHOR (#$NUMBER)
+template: |
+  ## What’s Changed
+
+  $CHANGES

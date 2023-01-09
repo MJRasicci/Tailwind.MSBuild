@@ -21,10 +21,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailwind.MSBuild.Tests", "Tests\Tailwind.MSBuild.UnitTests\Tailwind.MSBuild.Tests.csproj", "{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+		.github\release-drafter.yml = .github\release-drafter.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E54ADFE4-13DC-4825-A359-FD71FDA95E04}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
 	EndProjectSection
 EndProject
 Global

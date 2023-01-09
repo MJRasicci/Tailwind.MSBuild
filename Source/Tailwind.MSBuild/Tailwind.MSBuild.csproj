@@ -9,6 +9,7 @@
     <PackageDescription>Tailwind CSS Integration for .NET Projects</PackageDescription>
     <RepositoryUrl>https://github.com/mjrasicci/tailwind.msbuild</RepositoryUrl>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+    <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Label="Friend Assemblies">
@@ -17,7 +18,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.4.0" PrivateAssets="all" ExcludeAssets="Runtime" />
-    <PackageReference Include="System.Text.Json" Version="7.0.1" PrivateAssets="all"  />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

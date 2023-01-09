@@ -47,7 +47,7 @@ internal class GitHubClient : IDisposable
     /// </returns>
     public async Task<TailwindRelease?> GetLatestReleaseAsync()
     {
-        var response = await this.client.GetStringAsync("https://api.github.com/repos/mjrasicci/tailwindcss/releases/latest");
+        var response = await this.client.GetStringAsync("https://api.github.com/repos/tailwindlabs/tailwindcss/releases/latest");
         return JsonSerializer.Deserialize<TailwindRelease>(response);
     }
 
@@ -59,7 +59,7 @@ internal class GitHubClient : IDisposable
     /// </returns>
     public async Task<TailwindRelease?> GetReleaseAsync(string tag)
     {
-        var response = await this.client.GetStringAsync($"https://api.github.com/repos/mjrasicci/tailwindcss/releases/tags/{tag}");
+        var response = await this.client.GetStringAsync($"https://api.github.com/repos/tailwindlabs/tailwindcss/releases/tags/{tag}");
         return JsonSerializer.Deserialize<TailwindRelease>(response);
     }
 

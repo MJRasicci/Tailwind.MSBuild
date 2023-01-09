@@ -9,9 +9,11 @@ Tailwind CSS Integration for .NET Projects
 
 <!-- PROJECT SHIELDS -->
 [![Build Status][build-shield]][build-url]
-[![Downloads][downloads-shield]][downloads-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
+
+[![GitHub Downloads][github-downloads-shield]][github-packages-url]
+[![NuGet Downloads][nuget-downloads-shield]][nuget-url]
 
 <hr />
 </div>
@@ -40,7 +42,7 @@ Tailwind CSS Integration for .NET Projects
 
 ## About The Project
 
-Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It uses the [Tailwind Standalone CLI][tailwind-cli] so there are no additional dependencies and you do not have to have npm installed.
+Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It will also download the [Tailwind Standalone CLI][tailwind-cli] so you don't need to have npm installed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -48,13 +50,13 @@ Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwin
 
 ### Installation
 
-Use your preferred method of managing NuGet packages or use one of the following methods:
+Use your preferred method of managing NuGet packages or use one of the following installation methods.
 
 #### Visual Studio
 
 Install Tailwind.MSBuild using the NuGet Package Manager or with the following command in the Package Manager Console:
 
-```
+``` sh
 PM> Install-Package Tailwind.MSBuild
 ```
 
@@ -62,7 +64,7 @@ PM> Install-Package Tailwind.MSBuild
 
 You can add a package reference using the following command when the .NET CLI is available:
 
-```
+``` sh
 > dotnet add package Tailwind.MSBuild
 ```
 
@@ -70,7 +72,7 @@ You can add a package reference using the following command when the .NET CLI is
 
 You can manually add the following line to your `.csproj` file within an `ItemGroup`:
 
-```
+``` xml
 <PackageReference Include="Tailwind.MSBuild" Version="1.*" />
 ```
 
@@ -80,14 +82,14 @@ You can manually add the following line to your `.csproj` file within an `ItemGr
 
 ### Basic Use
 
-Once installed, you can customize Tailwind by modifying the `tailwind.config.js` and `tailwind.input.css` files in your configuration directory which defaults to `$(MSBuildProjectDirectory)\Properties\`. If the directory or either file does not exist, a default will be created for you the next time you build your project. For detailed instructions on configuring Tailwind CSS, see the official [Configuration][tailwind-docs] guide.
+Once installed, you can customize Tailwind by modifying the `tailwind.config.js` and `tailwind.input.css` files in your configuration directory which defaults to `$(MSBuildProjectDirectory)\Properties\`. If the directory or either file does not exist, a default configuration including postcss will be initialized for you the next time you build your project. For detailed instructions on configuring Tailwind CSS, see the official [Configuration][tailwind-docs] guide.
 
 Each time you build your project, a css file will be generated at `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css`. You can also customize your input and output file paths. For example, to set your input file to "src/styles/tailwind.css" and your output file to "wwwroot/css/tailwind.css", you can add the following to your .csproj file:
 
-```
+``` xml
 <PropertyGroup Label="Tailwind Properties">
-	<TailwindInputFile>$(MSBuildProjectDirectory)\src\styles\tailwind.css</TailwindInputFile>
-	<TailwindOutputFile>$(MSBuildProjectDirectory)\wwwroot\css\site.css</TailwindOutputFile>
+  <TailwindInputFile>$(MSBuildProjectDirectory)\src\styles\tailwind.css</TailwindInputFile>
+  <TailwindOutputFile>$(MSBuildProjectDirectory)\wwwroot\css\site.css</TailwindOutputFile>
 </PropertyGroup>
 ```
 
@@ -114,20 +116,20 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 
 Here is a sample configuration that overrides every setting.
 
-```
+``` xml
 <PropertyGroup Label="Tailwind Properties">
-    <!-- Lock Tailwind Version -->
-    <TailwindVersion>v3.2.4</TailwindVersion>
-    <!-- Place Tailwind CLI in obj directory -->
-    <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
-    <!-- Custom input and output file paths -->
-    <TailwindConfigDir>$(MSBuildProjectDirectory)\Tailwind\</TailwindConfigDir>
-    <!-- File names are relative to the TailwindConfigDir unless an absolute path is specified -->
-    <TailwindConfigFile>config.js</TailwindConfigFile>
-    <TailwindInputFile>input.css</TailwindInputFile>
-    <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
-    <!-- Always minify the generated css -->
-    <TailwindMinify>true</TailwindMinify>
+  <!-- Lock Tailwind Version -->
+  <TailwindVersion>v3.2.4</TailwindVersion>
+  <!-- Place Tailwind CLI in obj directory -->
+  <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
+  <!-- Custom input and output file paths -->
+  <TailwindConfigDir>$(MSBuildProjectDirectory)\Tailwind\</TailwindConfigDir>
+  <!-- File names are relative to the TailwindConfigDir unless an absolute path is specified -->
+  <TailwindConfigFile>config.js</TailwindConfigFile>
+  <TailwindInputFile>input.css</TailwindInputFile>
+  <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
+  <!-- Always minify the generated css -->
+  <TailwindMinify>true</TailwindMinify>
 </PropertyGroup>
 ```
 
@@ -135,7 +137,7 @@ Here is a sample configuration that overrides every setting.
 
 ### Executing Tasks
 
-[Tailwind.MSBuild.targets][tailwind-msbuild-targets] defines a build target named `BuildTailwind` that runs before the `BeforeCompile` target. This target executes two tasks that Tailwind.MSBuild implements. The first task is `GetTailwindCLI` which returns the absolute path to the tailwind CLI to the build engine. The output is stored in a property which is then passed to `BuildTailwindCSS` as the value for the `StandaloneCliPath` parameter.
+[Tailwind.MSBuild.targets][tailwind-msbuild-targets] defines a build target named `BuildTailwind` that runs before the `BeforeBuild` target. This target executes two tasks that Tailwind.MSBuild implements. The first task is `GetTailwindCLI` which returns the absolute path to the tailwind CLI to the build engine. The output is stored in a property which is then passed to `BuildTailwindCSS` as the value for the `StandaloneCliPath` parameter.
 
 For advanced scenarios where you need to run the tasks during a different point in the build process, see the tables below for the parameters required for each task and the associated MSBuild Property passed by default. It is recommended to read [Tailwind.MSBuild.targets][tailwind-msbuild-targets] as an example of how to properly invoke the MSBuild tasks.
 
@@ -146,9 +148,9 @@ For advanced scenarios where you need to run the tasks during a different point 
 | Version         | TailwindVersion     |
 | RootInstallPath | TailwindInstallPath |
 
-```
+``` xml
 <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
-    <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
+  <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
 </GetTailwindCLI>
 ```
 
@@ -163,14 +165,14 @@ For advanced scenarios where you need to run the tasks during a different point 
 | OutputFile        | TailwindOutputFile         |
 | Minify            | TailwindMinify             |
 
-```
+``` xml
 <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
                   ConfigDir="$(TailwindConfigDir)"
                   ConfigFile="$(TailwindConfigFile)"
                   InputFile="$(TailwindInputFile)"
                   OutputFile="$(TailwindOutputFile)"
                   Minify="$(TailwindMinify)">
-    <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
+  <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
 </BuildTailwindCSS>
 ```
 
@@ -183,8 +185,10 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 <p align="center">Copyright © 2022 Michael Rasicci</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[downloads-shield]: https://img.shields.io/github/downloads/mjrasicci/tailwind.msbuild/total?logo=github&style=for-the-badge
-[downloads-url]: https://github.com/MJRasicci?tab=packages&repo_name=Tailwind.MSBuild
+[github-downloads-shield]: https://img.shields.io/github/downloads/mjrasicci/tailwind.msbuild/total?logo=github&style=for-the-badge&label=Downloads+%28Preview%29
+[github-packages-url]: https://github.com/MJRasicci?tab=packages&repo_name=Tailwind.MSBuild
+[nuget-downloads-shield]: https://img.shields.io/nuget/dt/Tailwind.MSBuild?logo=nuget&style=for-the-badge&label=Downloads+%28Release%29
+[nuget-url]: https://www.nuget.org/packages/Tailwind.MSBuild
 [build-shield]: https://img.shields.io/github/actions/workflow/status/mjrasicci/tailwind.msbuild/build.yml?branch=main&logo=github&style=for-the-badge
 [build-url]: https://github.com/mjrasicci/tailwind.msbuild/actions/workflows/build.yml
 [issues-shield]: https://img.shields.io/github/issues/mjrasicci/tailwind.msbuild.svg?logo=github&style=for-the-badge

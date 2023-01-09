@@ -63,7 +63,7 @@ jobs:
         run: dotnet nuget add source "https://nuget.pkg.github.com/${{github.repository_owner}}/index.json" --name GitHub --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
       - name: Dotnet NuGet Push
-        run: dotnet nuget push .\*.nupkg --api-key ${{ secrets.GH_PAT }} --source GitHub --skip-duplicate
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GH_PAT }} --source GitHub --skip-duplicate
         shell: pwsh
 
   push-nuget:

@@ -60,7 +60,7 @@ jobs:
         with:
           name: "windows-latest"
       - name: Dotnet NuGet Add Source
-        run: dotnet nuget add source "https://nuget.pkg.github.com/${{github.repository_owner}}/index.json" --name github --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet nuget add source "https://nuget.pkg.github.com/mjrasicci/index.json" --name github --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
         shell: pwsh
       - name: Dotnet NuGet Push
         run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.GH_PAT }} --source "github" --skip-duplicate

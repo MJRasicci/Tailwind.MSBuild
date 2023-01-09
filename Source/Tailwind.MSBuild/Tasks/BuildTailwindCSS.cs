@@ -75,6 +75,8 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         // Build
         RunCli($"-c {this.ConfigFile} -i {this.InputFile} -o {this.OutputFile}{(this.Minify ? " -m" : string.Empty)}");
 
+        this.GeneratedCssFile = this.OutputFile;
+
         return !this.Log.HasLoggedErrors;
     }
 

@@ -35,7 +35,9 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
             // The file name is specific to the current platform and architecture
             var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{ProcessorArchitecture.CurrentProcessArchitecture}"
                          : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{ProcessorArchitecture.CurrentProcessArchitecture}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{ProcessorArchitecture.CurrentProcessArchitecture}.exe"
+                         // TODO: Expression should use CurrentProcessArchitecture after standalone cli v3.2.5 is released to include arm64 support
+                         // For now just download the x64 binary and let windows emulation layer handle it on arm64 machines
+                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-x64.exe"
                          : throw new Exception("Unable to detect the proper platform and runtime for TailwindCSS");
 
             fileName = fileName.ToLower();

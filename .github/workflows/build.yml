@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{matrix.os}}
-        path: "./nupkgs"
+        path: "./nupkgs/*.nupkg"
         
   push-github:
     name: Push GitHub Package

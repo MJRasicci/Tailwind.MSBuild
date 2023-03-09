@@ -12,7 +12,6 @@ Tailwind CSS Integration for .NET Projects
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-[![GitHub Downloads][github-downloads-shield]][github-packages-url]
 [![NuGet Downloads][nuget-downloads-shield]][nuget-url]
 
 <hr />
@@ -182,7 +181,7 @@ For advanced scenarios where you need to run the tasks during a different point 
 
 Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more information.
 
-<p align="center">Copyright © 2022 Michael Rasicci</p>
+<p align="center">Copyright © 2023 Michael Rasicci</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [github-downloads-shield]: https://img.shields.io/github/downloads/mjrasicci/tailwind.msbuild/total?logo=github&style=for-the-badge&label=Downloads+%28Preview%29

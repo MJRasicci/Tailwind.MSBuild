@@ -17,14 +17,14 @@ public class TaskFixture<T> where T : Microsoft.Build.Utilities.Task, new()
                 .Callback<BuildErrorEventArgs>(e => this.Errors.Add(e));
     }
 
-    public T Prepare(Action<T> configure)
+    public T Prepare(Action<T>? configure = null)
     {
         var task = new T
         {
             BuildEngine = this.BuildEngine.Object
         };
 
-        configure(task);
+        configure?.Invoke(task);
 
         return task;
     }

@@ -64,11 +64,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         if (!File.Exists(this.InputFile))
         {
             using var file = File.CreateText(this.InputFile);
-
-            file.WriteLine("@tailwind base;");
-            file.WriteLine("@tailwind components;");
-            file.WriteLine("@tailwind utilities;");
-
+            file.WriteLine("@tailwind base;\n@tailwind components;\n@tailwind utilities;");
             file.Close();
         }
 
@@ -93,7 +89,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardError = true
             }
         };
 

@@ -5,6 +5,7 @@ using FluentAssertions;
 using Tailwind.MSBuild.GitHub;
 using Tailwind.MSBuild.Tests.Common;
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 public class GitHubClientTests : IClassFixture<GitHubClientFixture>
 {
     private readonly GitHubClientFixture fixture;
@@ -49,9 +50,10 @@ public class GitHubClientTests : IClassFixture<GitHubClientFixture>
         };
 
         var request = this.fixture.Client.GetAssetAsync(asset);
-        await request;
+        var result = await request;
 
         request.IsCompletedSuccessfully.Should().BeTrue();
-        request.Result.Length.Should().BeGreaterThan(0);
+        result.Length.Should().BeGreaterThan(0);
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores

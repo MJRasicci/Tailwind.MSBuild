@@ -33,14 +33,10 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         try
         {
             // The file name is specific to the current platform and architecture
-            var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{ProcessorArchitecture.CurrentProcessArchitecture}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{ProcessorArchitecture.CurrentProcessArchitecture}"
-                         // TODO: Expression should use CurrentProcessArchitecture after standalone cli v3.2.5 is released to include arm64 support
-                         // For now just download the x64 binary and let windows emulation layer handle it on arm64 machines
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-x64.exe"
+            var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}"
+                         : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}"
+                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}.exe"
                          : throw new Exception("Unable to detect the proper platform and runtime for TailwindCSS");
-
-            fileName = fileName.ToLower();
 
             this.StandaloneCliPath = Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName));
 
@@ -69,7 +65,8 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         }
         catch (Exception ex)
         {
-            this.Log.LogErrorFromException(ex, true, true, null);
+            var targetsFile = Path.Combine(Path.GetDirectoryName(this.BuildEngine.ProjectFileOfTaskNode), "build", "Tailwind.MSBuild.targets");
+            this.Log.LogErrorFromException(ex, true, true, targetsFile);
         }
 
         return !this.Log.HasLoggedErrors;

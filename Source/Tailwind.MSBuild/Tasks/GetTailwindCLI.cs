@@ -1,5 +1,6 @@
 namespace Tailwind.MSBuild.Tasks;
 
+using System.Globalization;
 using Tailwind.MSBuild.GitHub;
 
 /// <summary>
@@ -32,10 +33,17 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
     {
         try
         {
+            var arch = ProcessorArchitecture.CurrentProcessArchitecture;
+
+            if (arch == ProcessorArchitecture.AMD64)
+                arch = "x64";
+            else
+                arch = arch.ToLower();
+
             // The file name is specific to the current platform and architecture
-            var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{ProcessorArchitecture.CurrentProcessArchitecture.ToLower()}.exe"
+            var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{arch}"
+                         : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{arch}"
+                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{arch}.exe"
                          : throw new Exception("Unable to detect the proper platform and runtime for TailwindCSS");
 
             this.StandaloneCliPath = Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName));

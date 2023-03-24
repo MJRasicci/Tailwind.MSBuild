@@ -12,17 +12,22 @@
 
 	<PropertyGroup Label="Package">
 		<Authors>Michael Rasicci</Authors>
-		<Company>mjrasicci.dev</Company>
+		<Company>MJRasicci</Company>
 		<Product>$(MSBuildProjectName)</Product>
 		<PackageId>$(MSBuildProjectName)</PackageId>
-		<Copyright>Copyright © $(Company) $([System.DateTime]::Now.ToString(yyyy))</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/$(Company)/$(SolutionName)</PackageProjectUrl>
+    <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
+    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright © $(Company) $([System.DateTime]::Now.ToString(yyyy))</Copyright>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Versioning">
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
-		<MinVerVerbosity>normal</MinVerVerbosity>
 	</PropertyGroup>
 
 	<ItemGroup Label="Package References">

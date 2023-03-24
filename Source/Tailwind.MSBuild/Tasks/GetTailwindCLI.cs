@@ -1,6 +1,5 @@
 namespace Tailwind.MSBuild.Tasks;
 
-using System.Globalization;
 using Tailwind.MSBuild.GitHub;
 
 /// <summary>
@@ -33,43 +32,12 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
     {
         try
         {
-            var arch = ProcessorArchitecture.CurrentProcessArchitecture;
-
-            if (arch == ProcessorArchitecture.AMD64)
-                arch = "x64";
-            else
-                arch = arch.ToLower();
-
-            // The file name is specific to the current platform and architecture
-            var fileName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"tailwindcss-macos-{arch}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"tailwindcss-linux-{arch}"
-                         : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"tailwindcss-windows-{arch}.exe"
-                         : throw new Exception("Unable to detect the proper platform and runtime for TailwindCSS");
-
-            this.StandaloneCliPath = Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName));
-
-            Directory.CreateDirectory(Path.GetDirectoryName(this.StandaloneCliPath));
-
-            using var client = new GitHubClient();
-
-            var release = (this.Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(this.Version)).GetAwaiter().GetResult();
-
-            var asset = (release?.Assets.FirstOrDefault(a => a.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
-                      ?? throw new Exception($"Unable to find a download link for '{fileName}' with Tailwind version '{this.Version}'");
-
-            var response = client.GetAssetAsync(asset).GetAwaiter().GetResult();
+            this.StandaloneCliPath = GetFilePath();
 
             if (File.Exists(this.StandaloneCliPath))
-                File.Delete(this.StandaloneCliPath);
-
-            using (var file = File.OpenWrite(this.StandaloneCliPath))
-            {
-                file.Write(response, 0, response.Length);
-                file.Close();
-            }
-
-            if (!File.Exists(this.StandaloneCliPath))
-                throw new Exception($"Unable to download '{asset.Name}' to '{this.StandaloneCliPath}'");
+                this.Log.LogMessage(MessageImportance.Low, "Using cached tailwind binary '{0}'", this.StandaloneCliPath);
+            else
+                DownloadCli(Path.GetFileName(this.StandaloneCliPath));
         }
         catch (Exception ex)
         {
@@ -78,5 +46,84 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         }
 
         return !this.Log.HasLoggedErrors;
+    }
+
+    public string GetFilePath()
+    {
+        // The file name is specific to the current platform and architecture
+        var platform = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macos"
+                     : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux"
+                     : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows"
+                     : throw new Exception("Platform unsupported");
+
+        var arch = ProcessorArchitecture.CurrentProcessArchitecture;
+
+        if (arch == ProcessorArchitecture.AMD64)
+            arch = "x64";
+        else
+            arch = arch.ToLower();
+
+        var fileName = $"tailwindcss-{platform}-{arch}";
+
+        if (platform == "windows")
+            fileName = $"{fileName}.exe";
+
+        return Path.GetFullPath(Path.Combine(this.RootInstallPath, this.Version, fileName));
+    }
+
+    private void DownloadCli(string fileName)
+    {
+        using var client = new GitHubClient();
+
+        var release = (this.Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(this.Version)).GetAwaiter().GetResult();
+
+        var asset = (release?.Assets.FirstOrDefault(a => a.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
+                  ?? throw new Exception($"Unable to find a download link for '{fileName}' with Tailwind version '{this.Version}'");
+
+        this.Log.LogMessage(MessageImportance.Low, "Downloading '{0}'", asset.DownloadUrl);
+
+        var response = client.GetAssetAsync(asset).GetAwaiter().GetResult();
+
+        this.Log.LogMessage(MessageImportance.Low, "Writing file to '{0}'", this.StandaloneCliPath);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(this.StandaloneCliPath));
+
+        using (var file = File.OpenWrite(this.StandaloneCliPath))
+        {
+            file.Write(response, 0, response.Length);
+            file.Close();
+        }
+
+        if (!File.Exists(this.StandaloneCliPath))
+            throw new Exception($"Unable to download '{asset.Name}' to '{this.StandaloneCliPath}'");
+
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            SetPosixFilePermissions();
+    }
+
+    private void SetPosixFilePermissions()
+    {
+        // Grant execute permissions to current user
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "chmod",
+                Arguments = $"+x {this.StandaloneCliPath}",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            }
+        };
+
+        // Route stderr and stdio to our TaskLoggingHelper
+        process.ErrorDataReceived += (sender, e) => this.Log.LogError(e.Data);
+        process.OutputDataReceived += (sender, e) => this.Log.LogMessage(e.Data);
+
+        this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
+
+        process.Start();
+        process.WaitForExit();
     }
 }

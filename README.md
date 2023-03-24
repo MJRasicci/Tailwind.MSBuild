@@ -43,6 +43,8 @@ Tailwind CSS Integration for .NET Projects
 
 Tailwind.MSBuild is a NuGet package that adds MSBuild tasks for building Tailwind CSS to your project. With this package, you can easily integrate Tailwind CSS into your .NET project and automatically generate your stylesheets as part of your project's build process. It will also download the [Tailwind Standalone CLI][tailwind-cli] so you don't need to have npm installed.
 
+> Disclaimer: This project is not affiliated with [Tailwind Labs][tailwind-labs].
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Getting Started
@@ -196,5 +198,6 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 [license-url]: https://github.com/mjrasicci/tailwind.msbuild/blob/master/LICENSE.txt
 [tailwind-cli]: https://tailwindcss.com/blog/standalone-cli
 [tailwind-docs]: https://tailwindcss.com/docs/configuration
+[tailwind-labs]: https://github.com/tailwindlabs
 [tailwind-msbuild-props]: ./Source/Tailwind.MSBuild/build/Tailwind.MSBuild.props
 [tailwind-msbuild-targets]: ./Source/Tailwind.MSBuild/build/Tailwind.MSBuild.targets

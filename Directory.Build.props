@@ -15,19 +15,13 @@
 		  <Company>MJRasicci</Company>
 		  <Product>$(MSBuildProjectName)</Product>
 		  <PackageId>$(MSBuildProjectName)</PackageId>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/$(Company)/$(SolutionName)</PackageProjectUrl>
     <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
     <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.ToString(yyyy))</Copyright>
 	</PropertyGroup>
-
-	<ItemGroup Label="Package Files">
-		<None Include="README.md" Pack="true" />
-		<None Include="LICENSE.md" Pack="true" />
-	</ItemGroup>
 
 	<PropertyGroup Label="Versioning">
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>

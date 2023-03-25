@@ -41,7 +41,7 @@ jobs:
       run: dotnet test
       
   build:
-    name: Build-${{matrix.os}}
+    name: Build Package
     if: github.event_name == 'push' || github.event_name == 'release'
     runs-on: windows-latest
     steps:

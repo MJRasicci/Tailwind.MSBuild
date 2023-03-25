@@ -4,6 +4,7 @@ using Xunit;
 using Tailwind.MSBuild.Tests.Common;
 using Tailwind.MSBuild.Tasks;
 using FluentAssertions;
+using System.Diagnostics;
 
 public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
 {
@@ -27,6 +28,24 @@ public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
 
         success.Should().BeTrue();
         File.Exists(getTailwindCli.StandaloneCliPath).Should().BeTrue();
+
+        // Make sure the file is able to be executed (checks Posix file permissions)
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = getTailwindCli.StandaloneCliPath,
+                Arguments = $"-h",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            }
+        };
+
+        process.Start();
+        process.WaitForExit();
+        process.ExitCode.Should().Be(0);
 
         Directory.Delete(getTailwindCli.RootInstallPath, true);
     }

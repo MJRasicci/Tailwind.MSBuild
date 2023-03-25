@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build, Test & Release
 
 on:
   workflow_dispatch:
@@ -19,12 +19,31 @@ env:
   MINVERBUILDMETADATA: build.${{github.run_number}}
 
 jobs:
-  build:
-    name: Build-${{matrix.os}}
+  test:
+    name: Test-${{matrix.os}}
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ windows-latest ]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Test
+      run: dotnet test
+      
+  build:
+    name: Build-${{matrix.os}}
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -43,7 +62,7 @@ jobs:
       with:
         name: ${{matrix.os}}
         path: "./nupkgs/*.nupkg"
-        
+
   push-github:
     name: Push GitHub Package
     needs: build
@@ -65,7 +84,7 @@ jobs:
       - name: Dotnet NuGet Push
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GH_PACKAGES_TOKEN }} --source github --skip-duplicate
         shell: pwsh
-
+        
   push-nuget:
     name: Push NuGet Package
     needs: build

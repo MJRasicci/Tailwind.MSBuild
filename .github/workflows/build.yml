@@ -60,7 +60,7 @@ jobs:
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: ${{matrix.os}}
+        name: "windows-latest"
         path: "./nupkgs/*.nupkg"
 
   push-github:

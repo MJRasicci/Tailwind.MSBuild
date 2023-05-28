@@ -11,12 +11,13 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="Package">
-		  <Authors>Michael Rasicci</Authors>
-		  <Company>MJRasicci</Company>
-		  <Product>$(MSBuildProjectName)</Product>
-		  <PackageId>$(MSBuildProjectName)</PackageId>
+		<Authors>Michael Rasicci</Authors>
+		<Company>MJRasicci</Company>
+		<Product>$(MSBuildProjectName)</Product>
+		<PackageId>$(MSBuildProjectName)</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/$(Company)/$(SolutionName)</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
     <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

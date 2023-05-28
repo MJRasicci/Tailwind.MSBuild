@@ -6,13 +6,17 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <DebugType>embedded</DebugType>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <IsPackable>true</IsPackable>
     <PackageDescription>Tailwind CSS Integration for .NET Projects</PackageDescription>
-    <RepositoryUrl>https://github.com/mjrasicci/tailwind.msbuild</RepositoryUrl>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
   </PropertyGroup>
-
+  
+  <ItemGroup Label="Package Files">
+    <None Include="..\..\README.md" pack="true" PackagePath="." />
+  </ItemGroup>
+  
   <ItemGroup Label="Friend Assemblies">
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>

@@ -6,22 +6,26 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <DebugType>embedded</DebugType>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <IsPackable>true</IsPackable>
     <PackageDescription>Tailwind CSS Integration for .NET Projects</PackageDescription>
-    <RepositoryUrl>https://github.com/mjrasicci/tailwind.msbuild</RepositoryUrl>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
   </PropertyGroup>
-
+  
+  <ItemGroup Label="Package Files">
+    <None Include="..\..\README.md" pack="true" PackagePath="." />
+  </ItemGroup>
+  
   <ItemGroup Label="Friend Assemblies">
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.5.0" PrivateAssets="all" ExcludeAssets="Runtime">
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.0" PrivateAssets="all" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="7.0.2" PrivateAssets="all" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

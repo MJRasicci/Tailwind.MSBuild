@@ -42,6 +42,12 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     public bool Minify { get; set; }
 
     /// <summary>
+    ///     Whether to run TailwindCSS in watch mode.
+    /// </summary>
+    [Required]
+    public bool Watch { get; set; }
+
+    /// <summary>
     ///     The absolute path to the file where the css was generated.
     /// </summary>
     [Output]
@@ -56,7 +62,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         if (!File.Exists(Path.Combine(this.ConfigDir, this.ConfigFile)))
         {
             Directory.CreateDirectory(this.ConfigDir);
-            RunCli($"init {this.ConfigFile} --postcss --full");
+            RunCli($"init {this.ConfigFile} --postcss");
         }
 
         this.InputFile = Path.Combine(this.ConfigDir, this.InputFile);
@@ -83,11 +89,9 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         {
             StartInfo = new ProcessStartInfo
             {
-                WorkingDirectory = ConfigDir,
+                WorkingDirectory = this.ConfigDir,
                 FileName = this.StandaloneCliPath,
                 Arguments = args,
-                CreateNoWindow = true,
-                UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             }
@@ -100,6 +104,8 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
         process.Start();
+        process.BeginErrorReadLine();
+        process.BeginOutputReadLine();
         process.WaitForExit();
     }
 }

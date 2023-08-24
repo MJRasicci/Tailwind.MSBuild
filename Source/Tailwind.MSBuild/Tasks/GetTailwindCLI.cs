@@ -73,9 +73,9 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
 
     private void DownloadCli(string fileName)
     {
-        using var client = new GitHubClient();
+        using var client = new TailwindDownloader();
 
-        var release = (this.Version.Equals("latest") ? client.GetLatestReleaseAsync() : client.GetReleaseAsync(this.Version)).GetAwaiter().GetResult();
+        var release = client.GetReleaseAsync(this.Version).GetAwaiter().GetResult();
 
         var asset = (release?.Assets.FirstOrDefault(a => a.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
                   ?? throw new Exception($"Unable to find a download link for '{fileName}' with Tailwind version '{this.Version}'");

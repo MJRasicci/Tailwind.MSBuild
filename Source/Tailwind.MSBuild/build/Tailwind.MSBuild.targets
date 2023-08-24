@@ -11,7 +11,8 @@
                       ConfigFile="$(TailwindConfigFile)"
                       InputFile="$(TailwindInputFile)"
                       OutputFile="$(TailwindOutputFile)"
-                      Minify="$(TailwindMinify)">
+                      Minify="$(TailwindMinify)"
+                      Watch="$(DotNetWatchBuild)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
     </BuildTailwindCSS>
   </Target>

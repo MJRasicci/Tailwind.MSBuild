@@ -18,7 +18,7 @@ public class GitHubClientTests : IClassFixture<GitHubClientFixture>
     [Fact]
     public async Task GetLatestReleaseAsync_Succeeds()
     {
-        var release = await this.fixture.Client.GetLatestReleaseAsync();
+        var release = await this.fixture.Client.GetReleaseAsync();
         release.Should().NotBeNull();
         release?.Assets.Should().NotBeNullOrEmpty();
     }
@@ -44,7 +44,6 @@ public class GitHubClientTests : IClassFixture<GitHubClientFixture>
     {
         var asset = new TailwindAsset
         {
-            ID = 84289937,
             Name = "tailwindcss-linux-x64",
             DownloadUrl = "https://github.com/tailwindlabs/tailwindcss/releases/download/v3.2.4/tailwindcss-linux-x64"
         };

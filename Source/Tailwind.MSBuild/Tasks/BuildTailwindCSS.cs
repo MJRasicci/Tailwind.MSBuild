@@ -92,6 +92,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
                 WorkingDirectory = this.ConfigDir,
                 FileName = this.StandaloneCliPath,
                 Arguments = args,
+                UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             }

@@ -18,6 +18,8 @@
 		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
+    <TailwindWatch Condition="'$(TailwindWatch)' == '' AND '$(DotNetWatchBuild)' == 'true'">true</TailwindWatch>
+    <TailwindWatch Condition="'$(TailwindWatch)' == ''">false</TailwindWatch>
 	</PropertyGroup>
 	
 </Project>

@@ -12,7 +12,7 @@
                       InputFile="$(TailwindInputFile)"
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"
-                      Watch="$(DotNetWatchBuild)">
+                      Watch="$(TailwindWatch)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
     </BuildTailwindCSS>
   </Target>

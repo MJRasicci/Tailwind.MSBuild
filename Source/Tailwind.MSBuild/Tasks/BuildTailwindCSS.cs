@@ -99,8 +99,17 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         };
 
         // Route stderr and stdio to our TaskLoggingHelper
-        process.ErrorDataReceived += (sender, e) => this.Log.LogError(e.Data);
-        process.OutputDataReceived += (sender, e) => this.Log.LogMessage(e.Data);
+        process.ErrorDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.Data))
+                this.Log.LogMessage(e.Data);
+        };
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.Data))
+                this.Log.LogMessage(e.Data);
+        };
 
         this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
 

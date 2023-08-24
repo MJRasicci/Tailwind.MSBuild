@@ -6,11 +6,11 @@ public class GitHubClientFixture : IDisposable
 {
     private bool disposed;
 
-    internal GitHubClient Client { get; private set; }
+    internal TailwindDownloader Client { get; private set; }
 
     public GitHubClientFixture()
     {
-        this.Client = new GitHubClient();
+        this.Client = new TailwindDownloader();
     }
 
     public void Dispose()

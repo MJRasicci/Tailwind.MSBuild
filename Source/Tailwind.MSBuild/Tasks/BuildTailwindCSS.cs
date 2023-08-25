@@ -115,7 +115,9 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
 
         this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
-        process.Start();
+        if (!process.Start())
+            this.Log.LogError($"Unable to start process from executable {process.StartInfo.FileName}");
+
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
         process.WaitForExit();

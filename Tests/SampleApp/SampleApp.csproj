@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)\..\..\Source\Tailwind.MSBuild\bin\Debug\netstandard2.0\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>
-    <TailwindInstallPath>$(BaseIntermediateOutputPath)\tailwind-cli\</TailwindInstallPath>
+    <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)..\..\Source\Tailwind.MSBuild\bin\Debug\netstandard2.0\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>
+    <TailwindInstallPath>$(BaseIntermediateOutputPath)tailwind-cli\</TailwindInstallPath>
   </PropertyGroup>
 
   <ItemGroup>

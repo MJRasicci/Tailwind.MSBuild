@@ -2,15 +2,14 @@ namespace Tailwind.MSBuild.Tests;
 
 using Xunit;
 using FluentAssertions;
-using Tailwind.MSBuild.GitHub;
+using Tailwind.MSBuild.Utilities;
 using Tailwind.MSBuild.Tests.Common;
 
-#pragma warning disable CA1707 // Identifiers should not contain underscores
-public class GitHubClientTests : IClassFixture<GitHubClientFixture>
+public class TailwindDownloaderTests : IClassFixture<TailwindDownloaderFixture>
 {
-    private readonly GitHubClientFixture fixture;
+    private readonly TailwindDownloaderFixture fixture;
 
-    public GitHubClientTests(GitHubClientFixture fixture)
+    public TailwindDownloaderTests(TailwindDownloaderFixture fixture)
     {
         this.fixture = fixture;
     }
@@ -55,4 +54,3 @@ public class GitHubClientTests : IClassFixture<GitHubClientFixture>
         result.Length.Should().BeGreaterThan(0);
     }
 }
-#pragma warning restore CA1707 // Identifiers should not contain underscores

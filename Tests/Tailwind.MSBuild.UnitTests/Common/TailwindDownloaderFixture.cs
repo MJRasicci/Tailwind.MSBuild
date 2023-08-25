@@ -1,14 +1,14 @@
 namespace Tailwind.MSBuild.Tests.Common;
 
-using Tailwind.MSBuild.GitHub;
+using Tailwind.MSBuild.Utilities;
 
-public class GitHubClientFixture : IDisposable
+public class TailwindDownloaderFixture : IDisposable
 {
     private bool disposed;
 
     internal TailwindDownloader Client { get; private set; }
 
-    public GitHubClientFixture()
+    public TailwindDownloaderFixture()
     {
         this.Client = new TailwindDownloader();
     }

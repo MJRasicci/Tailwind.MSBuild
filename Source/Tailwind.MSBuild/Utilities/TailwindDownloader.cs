@@ -1,4 +1,4 @@
-namespace Tailwind.MSBuild.GitHub;
+namespace Tailwind.MSBuild.Utilities;
 
 /// <summary>
 ///     Provides a basic client to download the Tailwind Standalone CLI from Github.
@@ -74,11 +74,10 @@ internal class TailwindDownloader : IDisposable
     public async Task<byte[]> GetAssetAsync(TailwindAsset tailwindBinary) => await this.client.GetByteArrayAsync(tailwindBinary.DownloadUrl);
 }
 
-
 /// <summary>
-///     A lightweight response model for the GitHub Releases API.
+///     A small response model for the GitHub Releases API.
 /// </summary>
-internal class TailwindRelease
+internal record TailwindRelease
 {
     /// <summary>
     ///     A collection of pre-built binaries for this release.
@@ -90,7 +89,7 @@ internal class TailwindRelease
 /// <summary>
 ///     A small model containing the download information for a release asset.
 /// </summary>
-internal class TailwindAsset
+internal record TailwindAsset
 {
     /// <summary>
     ///     The address to download the asset's binary content.

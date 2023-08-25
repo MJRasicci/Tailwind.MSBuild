@@ -2,8 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <TailwindMSBuildAssemblyDir>$(MSBuildThisFileDirectory)..\tasks\netstandard2.0</TailwindMSBuildAssemblyDir>
-    <TailwindMSBuildAssembly>$(TailwindMSBuildAssemblyDir)\$(MSBuildThisFileName).dll</TailwindMSBuildAssembly>
+    <TailwindMSBuildAssembly Condition="'$(TailwindMSBuildAssembly)' == ''">..\tasks\netstandard2.0\$(MSBuildThisFileName).dll</TailwindMSBuildAssembly>
   </PropertyGroup>
   
   <UsingTask TaskName="Tailwind.MSBuild.Tasks.GetTailwindCLI" AssemblyFile="$(TailwindMSBuildAssembly)"/>

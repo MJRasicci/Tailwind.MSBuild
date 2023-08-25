@@ -1,6 +1,6 @@
 namespace Tailwind.MSBuild.Tasks;
 
-using Tailwind.MSBuild.GitHub;
+using Tailwind.MSBuild.Utilities;
 
 /// <summary>
 ///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine. Outputs the absolute path to the executable.
@@ -54,14 +54,14 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         var platform = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macos"
                      : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux"
                      : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows"
-                     : throw new Exception("Platform unsupported");
+                     : throw new PlatformNotSupportedException("The TailwindCSS Standalone CLI does not support the current OS");
 
         var arch = ProcessorArchitecture.CurrentProcessArchitecture;
 
         if (arch == ProcessorArchitecture.AMD64)
             arch = "x64";
         else
-            arch = arch.ToLower();
+            arch = arch.ToLower(CultureInfo.CurrentCulture);
 
         var fileName = $"tailwindcss-{platform}-{arch}";
 
@@ -110,7 +110,6 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
             {
                 FileName = "chmod",
                 Arguments = $"+x {this.StandaloneCliPath}",
-                CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
@@ -118,12 +117,23 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         };
 
         // Route stderr and stdio to our TaskLoggingHelper
-        process.ErrorDataReceived += (sender, e) => this.Log.LogError(e.Data);
-        process.OutputDataReceived += (sender, e) => this.Log.LogMessage(e.Data);
+        process.ErrorDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.Data))
+                this.Log.LogMessage(e.Data);
+        };
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.Data))
+                this.Log.LogMessage(e.Data);
+        };
 
         this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
         process.Start();
+        process.BeginErrorReadLine();
+        process.BeginOutputReadLine();
         process.WaitForExit();
     }
 }

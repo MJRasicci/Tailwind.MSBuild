@@ -71,10 +71,13 @@ You can add a package reference using the following command when the .NET CLI is
 
 #### Manually Edit Your .csproj File
 
-You can manually add the following line to your `.csproj` file within an `ItemGroup`:
+You can manually add the following lines to your `.csproj` file within an `ItemGroup`:
 
 ``` xml
-<PackageReference Include="Tailwind.MSBuild" Version="1.*" />
+<PackageReference Include="Tailwind.MSBuild" Version="1.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+</PackageReference>
 ```
 
 > Note: You will need to build your project once in order to create the initial configuration when using this method.
@@ -186,9 +189,7 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 <p align="center">Copyright © 2023 Michael Rasicci</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[github-downloads-shield]: https://img.shields.io/github/downloads/mjrasicci/tailwind.msbuild/total?logo=github&style=for-the-badge&label=Downloads+%28Preview%29
-[github-packages-url]: https://github.com/MJRasicci?tab=packages&repo_name=Tailwind.MSBuild
-[nuget-downloads-shield]: https://img.shields.io/nuget/dt/Tailwind.MSBuild?logo=nuget&style=for-the-badge&label=Downloads+%28Release%29
+[nuget-downloads-shield]: https://img.shields.io/nuget/dt/Tailwind.MSBuild?logo=nuget&style=for-the-badge&label=Downloads
 [nuget-url]: https://www.nuget.org/packages/Tailwind.MSBuild
 [build-shield]: https://img.shields.io/github/actions/workflow/status/mjrasicci/tailwind.msbuild/build.yml?branch=main&logo=github&style=for-the-badge
 [build-url]: https://github.com/mjrasicci/tailwind.msbuild/actions/workflows/build.yml

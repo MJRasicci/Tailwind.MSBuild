@@ -4,14 +4,17 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
+  <!-- Ensure that Tailwind.MSBuild is built first, but don't include its output. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  
   <PropertyGroup>
     <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)..\..\Source\Tailwind.MSBuild\bin\Debug\netstandard2.0\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>
     <TailwindInstallPath>$(BaseIntermediateOutputPath)tailwind-cli\</TailwindInstallPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
   
   <Import Project="..\..\Source\Tailwind.MSBuild\build\Tailwind.MSBuild.props" />
   <Import Project="..\..\Source\Tailwind.MSBuild\build\Tailwind.MSBuild.targets" />

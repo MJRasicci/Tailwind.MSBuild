@@ -77,29 +77,29 @@ internal class TailwindDownloader : IDisposable
 /// <summary>
 ///     A small response model for the GitHub Releases API.
 /// </summary>
-internal record TailwindRelease
+internal struct TailwindRelease
 {
     /// <summary>
     ///     A collection of pre-built binaries for this release.
     /// </summary>
     [JsonPropertyName("assets")]
-    public IEnumerable<TailwindAsset> Assets { get; set; } = Array.Empty<TailwindAsset>();
+    public IEnumerable<TailwindAsset> Assets { get; set; }
 }
 
 /// <summary>
 ///     A small model containing the download information for a release asset.
 /// </summary>
-internal record TailwindAsset
+internal struct TailwindAsset
 {
     /// <summary>
     ///     The address to download the asset's binary content.
     /// </summary>
     [JsonPropertyName("browser_download_url")]
-    public string DownloadUrl { get; set; } = string.Empty;
+    public string DownloadUrl { get; set; }
 
     /// <summary>
     ///     The name of the download.
     /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
 }

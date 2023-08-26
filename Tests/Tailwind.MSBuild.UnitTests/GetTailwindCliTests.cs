@@ -4,7 +4,6 @@ using Xunit;
 using Tailwind.MSBuild.Tests.Common;
 using Tailwind.MSBuild.Tasks;
 using FluentAssertions;
-using System.Diagnostics;
 
 public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
 {

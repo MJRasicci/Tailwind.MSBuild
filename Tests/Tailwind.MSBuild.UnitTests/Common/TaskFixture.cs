@@ -6,7 +6,7 @@ public class TaskFixture<T> where T : Microsoft.Build.Utilities.Task, new()
 {
     public Mock<IBuildEngine> BuildEngine { get; }
 
-    public List<BuildErrorEventArgs> Errors { get; }
+    public IList<BuildErrorEventArgs> Errors { get; }
 
     public TaskFixture()
     {

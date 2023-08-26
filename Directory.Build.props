@@ -1,20 +1,42 @@
 <Project>
 
-	<PropertyGroup Label="Build">
+  <PropertyGroup Label="Build Properties">
     <LangVersion>latest</LangVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest</AnalysisLevel>
     <AnalysisMode>All</AnalysisMode>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NoWarn></NoWarn>
-	</PropertyGroup>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+    <!--
+      # CA1031: Do not catch general exception types
+      # Justification: Build tasks intercept exceptions to provide concise warnings to MSBuild without stopping the build
+      # https://docs.microsoft.com/en-us/visualstudio/code-quality/ca1031
+      #
+      # CA2201: Do not raise reserved exception types
+      # Justification: Lazy.
+      # https://docs.microsoft.com/en-us/visualstudio/code-quality/ca2201
+    -->
+    <NoWarn>CA1031;CA2201;</NoWarn>
+  </PropertyGroup>
 
-	<PropertyGroup Label="Package">
-		<Authors>Michael Rasicci</Authors>
-		<Company>MJRasicci</Company>
-		<Product>$(MSBuildProjectName)</Product>
-		<PackageId>$(MSBuildProjectName)</PackageId>
+  <PropertyGroup Label="Test Project Build Properties" Condition="$(MSBuildProjectName.EndsWith('Tests'))">
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!--
+      # CA1707: Identifiers should not contain underscores
+      # Justification: Test method names may contain underscores
+      # https://docs.microsoft.com/en-us/visualstudio/code-quality/ca1707
+    -->
+    <NoWarn>CA1707,$(NoWarn)</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package/Assembly Manifest Properties">
+    <Authors>Michael J Rasicci</Authors>
+    <Company>MJRasicci</Company>
+    <Product>$(MSBuildProjectName)</Product>
+    <PackageId>$(MSBuildProjectName)</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/$(Company)/$(SolutionName)</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -22,13 +44,14 @@
     <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.ToString(yyyy))</Copyright>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<PropertyGroup Label="Versioning">
-    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
-		<MinVerTagPrefix>v</MinVerTagPrefix>
-    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
-	</PropertyGroup>
+  <PropertyGroup Label="Versioning">
+    <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerVerbosity>normal</MinVerVerbosity>
+  </PropertyGroup>
 
 	<ItemGroup Label="Package References">
 		<PackageReference Include="MinVer" PrivateAssets="all" Version="4.3.0" />

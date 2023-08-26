@@ -60,7 +60,7 @@ public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
 
         var filePath = getTailwindCli.GetFilePath();
 
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
 
         using (var file = File.CreateText(filePath))
         {

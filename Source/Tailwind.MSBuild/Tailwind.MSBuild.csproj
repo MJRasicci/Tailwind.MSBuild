@@ -14,7 +14,7 @@
   </PropertyGroup>
   
   <ItemGroup Label="Package Files">
-    <None Include="..\..\README.md" pack="true" PackagePath="." />
+    <None Include="..\..\README.md" pack="true" PackagePath="." Visible="false" />
   </ItemGroup>
   
   <ItemGroup Label="Friend Assemblies">
@@ -22,9 +22,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" PrivateAssets="all" ExcludeAssets="Runtime">
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" IncludeAssets="compile; build; native; contentfiles; analyzers; buildtransitive" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" PrivateAssets="all" />
   </ItemGroup>
 

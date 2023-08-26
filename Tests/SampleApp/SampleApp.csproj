@@ -6,10 +6,7 @@
 
   <!-- Ensure that Tailwind.MSBuild is built first, but don't include its output. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" PrivateAssets="all" />
   </ItemGroup>
   
   <PropertyGroup>

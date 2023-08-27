@@ -2,8 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Target Name="BuildTailwind" BeforeTargets="BeforeBuild"
-          Inputs="$(TailwindInputFile);$(TailwindConfigFile)"
-          Outputs="$(GeneratedCssFile)">
+          Inputs="$(TailwindInputFile);$(TailwindConfigFile);@(Compile);@(Content)"
+          Outputs="$(TailwindOutputFile)">
     <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
       <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
     </GetTailwindCLI>

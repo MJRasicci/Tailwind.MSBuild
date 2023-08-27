@@ -50,7 +50,7 @@
     <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
-    <MinVerVerbosity>normal</MinVerVerbosity>
+    <MinVerVerbosity>minimal</MinVerVerbosity>
   </PropertyGroup>
 
 	<ItemGroup Label="Package References">

@@ -3,14 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
-
-  <!-- Ensure that Tailwind.MSBuild is built first, but don't include its output. -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
-  </ItemGroup>
   
   <PropertyGroup>
     <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)..\..\Source\Tailwind.MSBuild\bin\$(Configuration)\netstandard2.0\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>

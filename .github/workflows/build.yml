@@ -21,7 +21,7 @@ env:
 jobs:
   test:
     name: Test-${{matrix.os}}
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'pull_request'
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -66,7 +66,7 @@ jobs:
   push-github:
     name: Push GitHub Package
     needs: build
-    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'release'
     environment:
       name: "GitHub"
       url: https://github.com/${{ github.repository }}/packages
@@ -101,6 +101,6 @@ jobs:
       - name: Dotnet NuGet Push
         run: |
           Get-ChildItem .\ -Filter *.nupkg |
-          Where-Object { !$_.Name.Contains('preview') } |
+          Where-Object { !$_.Name.Contains('dev') } |
           ForEach-Object { dotnet nuget push $_ --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} }
         shell: pwsh

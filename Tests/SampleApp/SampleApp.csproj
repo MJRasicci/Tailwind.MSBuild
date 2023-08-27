@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
     </ProjectReference>
   </ItemGroup>
   

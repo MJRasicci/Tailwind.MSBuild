@@ -58,7 +58,7 @@ jobs:
     - name: Pack
       run: dotnet pack -c Release --output nupkgs --no-build
     - name: Publish Artifacts
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v3.1.3
       with:
         name: "windows-latest"
         path: "./nupkgs/*.nupkg"

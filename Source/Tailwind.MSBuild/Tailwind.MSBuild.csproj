@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
@@ -12,25 +12,39 @@
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup Label="Package Files">
     <None Include="..\..\README.md" pack="true" PackagePath="." Visible="false" />
   </ItemGroup>
-  
+
   <ItemGroup Label="Friend Assemblies">
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" PrivateAssets="all" ExcludeAssets="Runtime">
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" PrivateAssets="all" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="7.0.3" PrivateAssets="all" />
+    <PackageReference Include="System.Text.Json" Version="8.0.6" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="build\Tailwind.MSBuild.props" PackagePath="build\" />
     <Content Include="build\Tailwind.MSBuild.targets" PackagePath="build\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MinVer" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Build.Framework" />
+    <Using Include="Microsoft.Build.Utilities" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.Runtime.InteropServices" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
   </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">

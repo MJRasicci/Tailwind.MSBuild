@@ -9,7 +9,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     ///		The full path to the standalone-cli executable.
     /// </summary>
     [Required]
-	public string StandaloneCliPath { get; set; } = string.Empty;
+    public string StandaloneCliPath { get; set; } = string.Empty;
 
     /// <summary>
     ///		The directory containing the tailwind configuration files.
@@ -21,7 +21,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     ///		The name of the tailwind configuration file.
     /// </summary>
     [Required]
-	public string ConfigFile { get; set; } = string.Empty;
+    public string ConfigFile { get; set; } = string.Empty;
 
     /// <summary>
     ///     The name of the input css file.
@@ -57,7 +57,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     ///     Builds tailwindcss for the current project.
     /// </summary>
     public override bool Execute()
-	{
+    {
         // Init
         if (!File.Exists(Path.Combine(this.ConfigDir, this.ConfigFile)))
         {
@@ -84,8 +84,8 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         return !this.Log.HasLoggedErrors;
     }
 
-	private void RunCli(string args)
-	{
+    private void RunCli(string args)
+    {
         // The CLI process runs entirely in the background within the directory containing the configuration file
         using var process = new Process
         {

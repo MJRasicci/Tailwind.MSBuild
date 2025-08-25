@@ -7,10 +7,10 @@ using Tailwind.MSBuild.Utilities;
 /// </summary>
 public class GetTailwindCLI : Microsoft.Build.Utilities.Task
 {
-	/// <summary>
-	///		The version tag of the tailwind release to use, defaults to "latest" for the most current release.
-	/// </summary>
-	[Required]
+    /// <summary>
+    ///		The version tag of the tailwind release to use, defaults to "latest" for the most current release.
+    /// </summary>
+    [Required]
     public string Version { get; set; } = string.Empty;
 
     /// <summary>

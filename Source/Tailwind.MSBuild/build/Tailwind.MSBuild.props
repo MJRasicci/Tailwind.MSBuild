@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
+  
   <PropertyGroup>
     <TailwindMSBuildAssembly Condition="'$(TailwindMSBuildAssembly)' == ''">..\tasks\netstandard2.0\$(MSBuildThisFileName).dll</TailwindMSBuildAssembly>
   </PropertyGroup>
@@ -12,7 +12,7 @@
 		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
 		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
 		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
-		<TailwindConfigFile Condition="'$(TailwindConfigFile)' == ''">tailwind.config.js</TailwindConfigFile>
+		<TailwindSourceDir Condition="'$(TailwindSourceDir)' == ''">$(MSBuildProjectDirectory)</TailwindSourceDir>
 		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
 		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>

@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Target Name="BuildTailwind" BeforeTargets="BeforeBuild"
-          Inputs="$(TailwindInputFile);$(TailwindConfigFile);@(Compile);@(Content)"
+          Inputs="$(TailwindInputFile);$(TailwindSourceDir);@(Compile);@(Content)"
           Outputs="$(TailwindOutputFile)">
     <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
       <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
@@ -10,7 +10,7 @@
 
     <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
                       ConfigDir="$(TailwindConfigDir)"
-                      ConfigFile="$(TailwindConfigFile)"
+                      SourceDir="$(TailwindSourceDir)"
                       InputFile="$(TailwindInputFile)"
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"

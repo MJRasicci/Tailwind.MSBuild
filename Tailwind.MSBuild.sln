@@ -32,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "Sample\SampleApp\SampleApp.csproj", "{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +50,10 @@ Global
 		{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +63,7 @@ Global
 		{B2C4B84E-BA93-4D04-BA41-2C2F2DBFAB59} = {BB8069A9-F68B-4E64-B741-530ABA084AC7}
 		{24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B} = {A5F5A284-7E1A-4584-AD8C-EA4F9D291D1B}
 		{E54ADFE4-13DC-4825-A359-FD71FDA95E04} = {24E0E923-D7F0-4DB1-BEB9-6CD315D28E0B}
+		{ED115CF8-D77F-CB07-0AD0-D1A1AF2F560A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90B44879-0FE2-4B66-A18B-B38B71D1C65A}

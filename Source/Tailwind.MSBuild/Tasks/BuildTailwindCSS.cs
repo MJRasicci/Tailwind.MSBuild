@@ -18,10 +18,10 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     public string ConfigDir { get; set; } = string.Empty;
 
     /// <summary>
-    ///		The name of the tailwind configuration file.
+    ///		The directory containing the source files to be analyzed.
     /// </summary>
     [Required]
-	public string ConfigFile { get; set; } = string.Empty;
+	public string SourceDir { get; set; } = string.Empty;
 
     /// <summary>
     ///     The name of the input css file.
@@ -59,25 +59,17 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     public override bool Execute()
 	{
         // Init
-        if (!File.Exists(Path.Combine(this.ConfigDir, this.ConfigFile)))
-        {
-            Directory.CreateDirectory(this.ConfigDir);
-            RunCli($"init {this.ConfigFile} --postcss");
-        }
-
         this.InputFile = Path.Combine(this.ConfigDir, this.InputFile);
 
         if (!File.Exists(this.InputFile))
         {
             using var file = File.CreateText(this.InputFile);
-            file.WriteLine("@tailwind base;");
-            file.WriteLine("@tailwind components;");
-            file.WriteLine("@tailwind utilities;");
+            file.WriteLine("@import \"tailwindcss\";");
             file.Close();
         }
 
         // Build
-        RunCli($"-c \"{this.ConfigFile}\" -i \"{this.InputFile}\" -o \"{this.OutputFile}\"{(this.Minify ? " -m" : string.Empty)}");
+        RunCli($"-i \"{this.InputFile}\" -o \"{this.OutputFile}\" {(this.Minify ? "-m" : string.Empty)}");
 
         this.GeneratedCssFile = this.OutputFile;
 

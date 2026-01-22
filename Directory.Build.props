@@ -54,7 +54,7 @@
   </PropertyGroup>
 
 	<ItemGroup Label="Package References">
-		<PackageReference Include="MinVer" PrivateAssets="all" Version="4.3.0" />
+		<PackageReference Include="MinVer" PrivateAssets="all" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>

@@ -12,7 +12,6 @@
 		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
 		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
 		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
-		<TailwindConfigFile Condition="'$(TailwindConfigFile)' == ''">tailwind.config.js</TailwindConfigFile>
 		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
 		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
 		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>

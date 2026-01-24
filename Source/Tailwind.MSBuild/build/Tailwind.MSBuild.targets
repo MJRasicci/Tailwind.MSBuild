@@ -10,7 +10,6 @@
 
     <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
                       ConfigDir="$(TailwindConfigDir)"
-                      ConfigFile="$(TailwindConfigFile)"
                       InputFile="$(TailwindInputFile)"
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"

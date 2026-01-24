@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <!-- Metadata -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head>
+        <!-- Metadata -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Title -->
-    <title>Tailwind.MSBuild SampleApp</title>
+        <!-- Title -->
+        <title>Tailwind.MSBuild SampleApp</title>
 
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
-</head>
+        <!-- Stylesheet -->
+        <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
+    </head>
 
-<body class="bg-gray-100">
-    <!-- Header -->
-    <header class="bg-blue-500 text-white p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl">Sample App</h1>
-        </div>
-    </header>
+    <body class="bg-gray-100 min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-blue-500 text-white p-4 flex-none">
+            <div class="container mx-auto">
+                <h1 class="text-2xl">Sample App</h1>
+            </div>
+        </header>
 
-    <!-- Body -->
-    <main class="container mx-auto my-4 p-4">
-        @RenderBody()
-    </main>
+        <!-- Content -->
+        <main class="flex-1 min-h-0 overflow-y-auto">
+            <div class="container mx-auto my-4 p-4">
+                @RenderBody()
+            </div>
+        </main>
 
-    <!-- Footer -->
-    <footer class="bg-blue-500 text-white p-4">
-        <div class="container mx-auto">
-            <p class="text-sm">Copyright &copy; 2023 Sample App</p>
-        </div>
-    </footer>
-</body>
+        <!-- Footer -->
+        <footer class="bg-blue-500 text-white p-4 flex-none">
+            <div class="container mx-auto">
+                <p class="text-sm">Copyright &copy; 2026 Sample App</p>
+            </div>
+        </footer>
+    </body>
 </html>

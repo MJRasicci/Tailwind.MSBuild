@@ -35,17 +35,22 @@ internal class TailwindDownloader : IDisposable
     {
         this.client = new HttpClient();
 
+        var packageVersion = typeof(TailwindDownloader).Assembly
+                                                       .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                                                       .InformationalVersion
+                                                       ?? "0.0.0";
+
         // The GitHub REST API requires a user-agent header for unauthenticated requests.
-        this.client.DefaultRequestHeaders.Add("User-Agent", "Tailwind.MSBuild/1.1.0 mjrasicci.dev");
+        this.client.DefaultRequestHeaders.Add("User-Agent", $"Tailwind.MSBuild/{packageVersion} mjrasicci.dev");
     }
 
     /// <summary>
     ///     Get the published release with the specified tag. If no tag is specified, gets the latest release.
     /// </summary>
     /// <returns>
-    ///     A <see cref="TailwindRelease" /> for the specified version of TailwindCSS.
+    ///     A <see cref="GitHubReleaseResponse" /> for the specified version of TailwindCSS.
     /// </returns>
-    public async Task<TailwindRelease?> GetReleaseAsync(string? tag = null)
+    public async Task<GitHubReleaseResponse?> GetReleaseAsync(string? tag = null)
     {
         var requestUri = "https://api.github.com/repos/tailwindlabs/tailwindcss/releases";
 
@@ -59,11 +64,11 @@ internal class TailwindDownloader : IDisposable
         }
 
         var response = await this.client.GetStringAsync(requestUri);
-        return JsonSerializer.Deserialize<TailwindRelease>(response);
+        return JsonSerializer.Deserialize<GitHubReleaseResponse>(response);
     }
 
     /// <summary>
-    ///     Downloads a <see cref="TailwindAsset" />.
+    ///     Downloads a <see cref="GitHubReleaseAsset" />.
     /// </summary>
     /// <param name="tailwindBinary">
     ///     The platform specific binary to download.
@@ -71,25 +76,25 @@ internal class TailwindDownloader : IDisposable
     /// <returns>
     ///     A byte array containing the asset.
     /// </returns>
-    public async Task<byte[]> GetAssetAsync(TailwindAsset tailwindBinary) => await this.client.GetByteArrayAsync(tailwindBinary.DownloadUrl);
+    public async Task<byte[]> GetAssetAsync(GitHubReleaseAsset tailwindBinary) => await this.client.GetByteArrayAsync(tailwindBinary.DownloadUrl);
 }
 
 /// <summary>
 ///     A small response model for the GitHub Releases API.
 /// </summary>
-internal struct TailwindRelease
+internal struct GitHubReleaseResponse
 {
     /// <summary>
     ///     A collection of pre-built binaries for this release.
     /// </summary>
     [JsonPropertyName("assets")]
-    public IEnumerable<TailwindAsset> Assets { get; set; }
+    public IEnumerable<GitHubReleaseAsset> Assets { get; set; }
 }
 
 /// <summary>
 ///     A small model containing the download information for a release asset.
 /// </summary>
-internal struct TailwindAsset
+internal struct GitHubReleaseAsset
 {
     /// <summary>
     ///     The address to download the asset's binary content.

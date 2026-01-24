@@ -13,4 +13,6 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using Microsoft.Build.Utilities;
 global using System.Threading.Tasks;
+global using System.Reflection;
+
 #pragma warning restore IDE0065 // Misplaced using directive

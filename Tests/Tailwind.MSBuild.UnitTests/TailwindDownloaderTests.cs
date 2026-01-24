@@ -25,7 +25,7 @@ public class TailwindDownloaderTests : IClassFixture<TailwindDownloaderFixture>
     [Fact]
     public async Task GetReleaseAsync_Succeeds()
     {
-        var release = await this.fixture.Client.GetReleaseAsync("v3.2.4");
+        var release = await this.fixture.Client.GetReleaseAsync("v4.1.18");
         release.Should().NotBeNull();
         release?.Assets.Should().NotBeNullOrEmpty();
     }
@@ -44,7 +44,7 @@ public class TailwindDownloaderTests : IClassFixture<TailwindDownloaderFixture>
         var asset = new GitHubReleaseAsset
         {
             Name = "tailwindcss-linux-x64",
-            DownloadUrl = "https://github.com/tailwindlabs/tailwindcss/releases/download/v3.2.4/tailwindcss-linux-x64"
+            DownloadUrl = "https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.18/tailwindcss-linux-x64"
         };
 
         var request = this.fixture.Client.GetAssetAsync(asset);

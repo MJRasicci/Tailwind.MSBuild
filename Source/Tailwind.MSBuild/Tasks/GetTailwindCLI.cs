@@ -2,6 +2,9 @@ namespace Tailwind.MSBuild.Tasks;
 
 using Tailwind.MSBuild.Utilities;
 
+// Prevent conflicts with System.Reflection.ProcessorArchitecture
+using ProcessorArchitecture = Microsoft.Build.Utilities.ProcessorArchitecture;
+
 /// <summary>
 ///		An MSBuild task to verify the tailwindcss standalone-cli tool is available on the current machine. Outputs the absolute path to the executable.
 /// </summary>

@@ -1,5 +1,8 @@
 namespace Tailwind.MSBuild.Tasks;
 
+// Prevent conflicts with System.Reflection.ProcessorArchitecture
+using ProcessorArchitecture = Microsoft.Build.Utilities.ProcessorArchitecture;
+
 public abstract class TailwindCliTask : ToolTask
 {
     /// <summary>

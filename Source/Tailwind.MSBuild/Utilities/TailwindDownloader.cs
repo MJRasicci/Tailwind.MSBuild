@@ -36,8 +36,8 @@ internal class TailwindDownloader : IDisposable
         this.client = new HttpClient();
 
         var packageVersion = typeof(TailwindDownloader).Assembly
-                                                       .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-                                                       .InformationalVersion
+                                                       .GetCustomAttribute<AssemblyFileVersionAttribute>()?
+                                                       .Version
                                                        ?? "0.0.0";
 
         // The GitHub REST API requires a user-agent header for unauthenticated requests.

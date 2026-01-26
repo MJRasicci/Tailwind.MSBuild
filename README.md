@@ -75,7 +75,7 @@ You can add a package reference using the following command when the .NET CLI is
 You can manually add the following lines to your `.csproj` file within an `ItemGroup`:
 
 ``` xml
-<PackageReference Include="Tailwind.MSBuild" Version="1.*">
+<PackageReference Include="Tailwind.MSBuild" Version="2.*">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
 </PackageReference>
@@ -113,6 +113,8 @@ Manual override for hot-reload:
 
 When watch mode is enabled, Tailwind.MSBuild launches the Tailwind CLI in its own window and does not manage the lifecycle further. Close that window when you want it to stop running.
 
+To avoid duplicate Tailwind CLI instances during watch builds, Tailwind.MSBuild tracks running processes in a lock file. You can override the lock file location with `TailwindLockFile`.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Customize Your Build
@@ -130,6 +132,7 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 | TailwindOutputFile    | `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css`                             | The path where the output css file will be located.        |
 | TailwindMinify        | `false` for Debug builds, `true` for Release builds                               | Whether the generated css should be minified or not.       |
 | TailwindWatch         | `true` when `BuildingInsideVisualStudio` or `DotNetWatchBuild`, otherwise `false` | Whether Tailwind runs in watch mode.                       |
+| TailwindLockFile      | `$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock`                           | The path to the Tailwind CLI lock file.                    |
 
 >### ⚠️ *A note about `TailwindInstallPath`*:
 > For the default install path, `$(MSBuildThisFileDirectory)` expands to the directory where [Tailwind.MSBuild.props][tailwind-msbuild-props] was extracted to. This means the default value of `TailwindInstallPath` is the equivilant of `{NuGetPackageCache}\tailwind.msbuild\*VERSION*\cli\`.
@@ -151,6 +154,8 @@ Here is a sample configuration that overrides every setting.
   <TailwindMinify>true</TailwindMinify>
   <!-- Force watch mode -->
   <TailwindWatch>true</TailwindWatch>
+  <!-- Override lock file location -->
+  <TailwindLockFile>$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock</TailwindLockFile>
 </PropertyGroup>
 ```
 
@@ -180,11 +185,13 @@ For advanced scenarios where you need to run the tasks during a different point 
 | Task Parameter    | MSBuild Property           |
 |-------------------|----------------------------|
 | StandaloneCliPath | Output of `GetTailwindCLI` |
-| WorkingDir        | TailwindConfigDir          |
+| ConfigDir         | TailwindConfigDir          |
 | InputFile         | TailwindInputFile          |
 | OutputFile        | TailwindOutputFile         |
 | Minify            | TailwindMinify             |
 | Watch             | TailwindWatch              |
+| WatchLockFile     | TailwindLockFile           |
+| ProjectDirectory  | MSBuildProjectDirectory    |
 
 ``` xml
 <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
@@ -192,7 +199,9 @@ For advanced scenarios where you need to run the tasks during a different point 
                   InputFile="$(TailwindInputFile)"
                   OutputFile="$(TailwindOutputFile)"
                   Minify="$(TailwindMinify)"
-                  Watch="$(TailwindWatch)">
+                  Watch="$(TailwindWatch)"
+                  WatchLockFile="$(TailwindLockFile)"
+                  ProjectDirectory="$(MSBuildProjectDirectory)">
   <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
 </BuildTailwindCSS>
 ```

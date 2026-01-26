@@ -1,5 +1,7 @@
 namespace Tailwind.MSBuild.Tasks;
 
+using Tailwind.MSBuild.Utilities;
+
 /// <summary>
 ///     An MSBuild task to build TailwindCSS within a project.
 /// </summary>
@@ -46,6 +48,12 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     /// </summary>
     [Required]
     public bool Watch { get; set; }
+
+    /// <summary>
+    ///     The path to the lock file used to prevent duplicate Tailwind CLI instances.
+    /// </summary>
+    [Required]
+    public string WatchLockFile { get; set; } = string.Empty;
 
     /// <summary>
     ///     The absolute path to the file where the css was generated.
@@ -113,14 +121,142 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
 
         this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
-        if (!process.Start())
-            this.Log.LogError($"Unable to start process from executable {process.StartInfo.FileName}");
+        if (ShouldUseLockFile())
+        {
+            if (!TryStartProcessWithLock(process))
+                return;
+        }
+        else
+        {
+            if (!StartProcess(process))
+                return;
+        }
 
         if (!this.Watch)
         {
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
             process.WaitForExit();
+        }
+    }
+
+    private bool TryStartProcessWithLock(Process process)
+    {
+        var lockFilePath = GetLockFilePath();
+        var lockFileDirectory = Path.GetDirectoryName(lockFilePath);
+
+        if (!string.IsNullOrWhiteSpace(lockFileDirectory))
+            Directory.CreateDirectory(lockFileDirectory);
+
+        using var lockStream = TryOpenLockFileStream(lockFilePath);
+
+        if (lockStream == null)
+        {
+            this.Log.LogMessage(MessageImportance.Low, "Unable to access Tailwind lock file '{0}' after multiple attempts.", lockFilePath);
+            return false;
+        }
+
+        var lockFile = TailwindLockFile.Read(lockStream, out var isCorrupt);
+
+        if (isCorrupt)
+            this.Log.LogMessage(MessageImportance.Low, "Tailwind lock file '{0}' was invalid and has been reset.", lockFilePath);
+
+        var matchingEntries = lockFile.Entries
+                                      .Where(entry => string.Equals(entry.ProjectDirectory, this.ProjectDirectory, StringComparison.OrdinalIgnoreCase))
+                                      .ToList();
+
+        var runningEntry = matchingEntries.FirstOrDefault(entry => IsProcessRunning(entry.ProcessId));
+
+        if (runningEntry != null)
+        {
+            this.Log.LogMessage(MessageImportance.Low, "Tailwind watch already running for '{0}' (PID {1}).", this.ProjectDirectory, runningEntry.ProcessId);
+            return false;
+        }
+
+        if (matchingEntries.Count > 0)
+            lockFile.Entries.RemoveAll(entry => string.Equals(entry.ProjectDirectory, this.ProjectDirectory, StringComparison.OrdinalIgnoreCase));
+
+        if (!StartProcess(process))
+            return false;
+
+        lockFile.Entries.Add(new TailwindLockFileEntry
+        {
+            ProcessId = process.Id,
+            StartedAtUtc = DateTimeOffset.UtcNow,
+            ProjectDirectory = this.ProjectDirectory
+        });
+
+        lockFile.Write(lockStream);
+        return true;
+    }
+
+    private bool StartProcess(Process process)
+    {
+        if (process.Start())
+            return true;
+
+        this.Log.LogError($"Unable to start process from executable {process.StartInfo.FileName}");
+        return false;
+    }
+
+    private bool ShouldUseLockFile()
+    {
+        return this.Watch && !string.IsNullOrWhiteSpace(this.WatchLockFile);
+    }
+
+    private static FileStream? TryOpenLockFileStream(string lockFilePath)
+    {
+        const int maxAttempts = 5;
+        const int retryDelayMs = 100;
+
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            try
+            {
+                return new FileStream(lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (IOException) when (attempt < maxAttempts - 1)
+            {
+                System.Threading.Thread.Sleep(retryDelayMs);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                break;
+            }
+        }
+
+        return null;
+    }
+
+    private string GetLockFilePath()
+    {
+        if (Path.IsPathRooted(this.WatchLockFile))
+            return this.WatchLockFile;
+
+        return Path.GetFullPath(Path.Combine(this.ProjectDirectory, this.WatchLockFile));
+    }
+
+    private static bool IsProcessRunning(int processId)
+    {
+        if (processId <= 0)
+            return false;
+
+        try
+        {
+            using var process = Process.GetProcessById(processId);
+            return !process.HasExited;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return false;
         }
     }
 

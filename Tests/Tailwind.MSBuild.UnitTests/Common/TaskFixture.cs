@@ -11,7 +11,7 @@ public class TaskFixture<T> where T : Microsoft.Build.Utilities.Task, new()
     public TaskFixture()
     {
         this.BuildEngine = new Mock<IBuildEngine>();
-        this.Errors = new List<BuildErrorEventArgs>();
+        this.Errors = [];
         this.BuildEngine
                 .Setup(_ => _.LogErrorEvent(It.IsAny<BuildErrorEventArgs>()))
                 .Callback<BuildErrorEventArgs>(e => this.Errors.Add(e));

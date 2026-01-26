@@ -6,6 +6,12 @@ namespace Tailwind.MSBuild.Tasks;
 public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
 {
     /// <summary>
+    ///     The value of MSBuildProjectDirectory.
+    /// </summary>
+    [Required]
+    public string ProjectDirectory { get; set; } = string.Empty;
+
+    /// <summary>
     ///		The full path to the standalone-cli executable.
     /// </summary>
     [Required]
@@ -56,8 +62,14 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
 
         if (!File.Exists(this.InputFile))
         {
+            var sourcePath = GetPathToSourceDirectory();
+
             using var file = File.CreateText(this.InputFile);
             file.WriteLine("@import \"tailwindcss\";");
+
+            if (!string.IsNullOrWhiteSpace(sourcePath))
+                file.WriteLine($"@source \"{sourcePath}\";");
+
             file.Close();
         }
 
@@ -110,5 +122,42 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
             process.BeginOutputReadLine();
             process.WaitForExit();
         }
+    }
+
+    private string? GetPathToSourceDirectory()
+    {
+        // Normalize to full paths and ensure trailing separators for directory semantics
+        var sourceDir = EnsureTrailingSeparator(Path.GetFullPath(this.ConfigDir));
+        var destDir = EnsureTrailingSeparator(Path.GetFullPath(this.ProjectDirectory));
+
+        var sourceUri = new Uri(sourceDir, UriKind.Absolute);
+        var destUri = new Uri(destDir, UriKind.Absolute);
+
+        // Different volumes / roots -> return absolute destination (normalized)
+        if (!string.Equals(sourceUri.Scheme, destUri.Scheme, StringComparison.OrdinalIgnoreCase))
+            return NormalizeSlashes(destDir);
+
+        var relativeUri = sourceUri.MakeRelativeUri(destUri);
+
+        var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+        // Convert URI separators to POSIX path separators
+        return NormalizeSlashes(relativePath);
+    }
+
+    private static string EnsureTrailingSeparator(string path)
+    {
+        if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
+            !path.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+        {
+            path += Path.DirectorySeparatorChar;
+        }
+
+        return path;
+    }
+
+    private static string NormalizeSlashes(string path)
+    {
+        return path.Replace('\\', '/');
     }
 }

@@ -20,21 +20,22 @@ Tailwind CSS Integration for .NET Projects
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
+    <li><a href="#about-the-project">About The Project</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#installation">Installation</a></li>
         <li><a href="#basic-use">Basic Use</a></li>
+        <li><a href="#watch-mode">Watch Mode</a></li>
       </ul>
     </li>
-    <li><a href="#customize-your-build">Customize Your Build</a></li>
-    <ul>
-        <li><a href="#setting-build-properties">Setting Build Properties</a></li>
-        <li><a href="#executing-tasks">Executing Tasks</a></li>
-    </ul>
+    <li>
+      <a href="#customize-your-build">Customize Your Build</a>
+      <ul>
+          <li><a href="#setting-build-properties">Setting Build Properties</a></li>
+          <li><a href="#executing-tasks">Executing Tasks</a></li>
+      </ul>
+    </li>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
@@ -99,20 +100,36 @@ Each time you build your project, a css file will be generated at `$(MSBuildProj
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Watch Mode
+
+Tailwind.MSBuild supports watch and hot-reload workflows by starting the Tailwind CLI in watch mode when it can detect a watch build.
+
+Auto-detected scenarios:
+- When `$(BuildingInsideVisualStudio)` or `$(DotNetWatchBuild)` is `true`, `TailwindWatch` defaults to `true` and the build runs in watch mode.
+- When running `dotnet watch build` or `dotnet watch run --no-hot-reload`, the `TailwindStartWatchForDotNetWatch` target runs after `GenerateWatchList` to start the build in watch mode.
+
+Manual override for hot-reload:
+- When running `dotnet watch run` (the default `dotnet watch` behavior), `GenerateWatchList` is not run and `$(DotNetWatchBuild)` is not set so there is no way to detect those builds. Use `dotnet watch -p:TailwindWatch=true` or add `<TailwindWatch>true</TailwindWatch>` in your MSBuild or project files to force tailwind to start in watch mode.
+
+When watch mode is enabled, Tailwind.MSBuild launches the Tailwind CLI in its own window and does not manage the lifecycle further. Close that window when you want it to stop running.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Customize Your Build
 
 ### Setting Build Properties
 
 If you want to change any of the default settings Tailwind.MSBuild uses, you can override them by setting any of the following properties in your `.csproj` file.
 
-| MSBuild Property Name | Default Value                                         | Description                                                |
-|-----------------------|-------------------------------------------------------|------------------------------------------------------------|
-| TailwindVersion       | `latest`                                              | The version tag of the tailwind release to use.            |
-| TailwindInstallPath   | `$(MSBuildThisFileDirectory)..\cli\`                  | The directory where the tailwindcss cli should be located. |
-| TailwindConfigDir     | `$(MSBuildProjectDirectory)\Properties\`              | The directory containing the tailwind configuration files. |
-| TailwindInputFile     | `tailwind.input.css`                                  | The name of the input css file.                            |
-| TailwindOutputFile    | `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css` | The path where the output css file will be located.        |
-| TailwindMinify        | `false` for Debug builds, `true` for Release builds   | Whether the generated css should be minified or not.       |
+| MSBuild Property Name | Default Value                                                                     | Description                                                |
+|-----------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------|
+| TailwindVersion       | `latest`                                                                          | The version tag of the tailwind release to use.            |
+| TailwindInstallPath   | `$(MSBuildThisFileDirectory)..\cli\`                                              | The directory where the tailwindcss cli should be located. |
+| TailwindConfigDir     | `$(MSBuildProjectDirectory)\Properties\`                                          | The directory containing the tailwind configuration files. |
+| TailwindInputFile     | `tailwind.input.css`                                                              | The name of the input css file.                            |
+| TailwindOutputFile    | `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css`                             | The path where the output css file will be located.        |
+| TailwindMinify        | `false` for Debug builds, `true` for Release builds                               | Whether the generated css should be minified or not.       |
+| TailwindWatch         | `true` when `BuildingInsideVisualStudio` or `DotNetWatchBuild`, otherwise `false` | Whether Tailwind runs in watch mode.                       |
 
 >### ⚠️ *A note about `TailwindInstallPath`*:
 > For the default install path, `$(MSBuildThisFileDirectory)` expands to the directory where [Tailwind.MSBuild.props][tailwind-msbuild-props] was extracted to. This means the default value of `TailwindInstallPath` is the equivilant of `{NuGetPackageCache}\tailwind.msbuild\*VERSION*\cli\`.
@@ -132,6 +149,8 @@ Here is a sample configuration that overrides every setting.
   <TailwindOutputFile>..\wwwroot\css\site.min.css</TailwindOutputFile>
   <!-- Always minify the generated css -->
   <TailwindMinify>true</TailwindMinify>
+  <!-- Force watch mode -->
+  <TailwindWatch>true</TailwindWatch>
 </PropertyGroup>
 ```
 
@@ -165,13 +184,15 @@ For advanced scenarios where you need to run the tasks during a different point 
 | InputFile         | TailwindInputFile          |
 | OutputFile        | TailwindOutputFile         |
 | Minify            | TailwindMinify             |
+| Watch             | TailwindWatch              |
 
 ``` xml
 <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
                   ConfigDir="$(TailwindConfigDir)"
                   InputFile="$(TailwindInputFile)"
                   OutputFile="$(TailwindOutputFile)"
-                  Minify="$(TailwindMinify)">
+                  Minify="$(TailwindMinify)"
+                  Watch="$(TailwindWatch)">
   <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
 </BuildTailwindCSS>
 ```

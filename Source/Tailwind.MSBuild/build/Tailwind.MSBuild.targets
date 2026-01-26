@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Target Name="BuildTailwind" BeforeTargets="BeforeBuild"
+  <Target Name="BuildTailwind"
+          BeforeTargets="BeforeBuild"
           Inputs="$(TailwindInputFile);@(Compile);@(Content)"
-          Outputs="$(TailwindOutputFile)">
+          Outputs="$(TailwindOutputFile)"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+
     <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
       <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
     </GetTailwindCLI>
@@ -16,6 +19,25 @@
                       Watch="$(TailwindWatch)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
     </BuildTailwindCSS>
+
   </Target>
   
+  <Target Name="TailwindStartWatchForDotNetWatch"
+          AfterTargets="GenerateWatchList">
+    
+    <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
+      <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
+    </GetTailwindCLI>
+
+    <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
+                      ConfigDir="$(TailwindConfigDir)"
+                      InputFile="$(TailwindInputFile)"
+                      OutputFile="$(TailwindOutputFile)"
+                      Minify="$(TailwindMinify)"
+                      Watch="$(TailwindWatch)">
+      <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
+    </BuildTailwindCSS>
+
+  </Target>
+
 </Project>

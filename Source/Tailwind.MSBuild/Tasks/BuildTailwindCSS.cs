@@ -62,7 +62,7 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         }
 
         // Build
-        RunCli($"-i \"{this.InputFile}\" -o \"{this.OutputFile}\"{(this.Minify ? " -m" : string.Empty)}");
+        RunCli($"-i \"{this.InputFile}\" -o \"{this.OutputFile}\"{(this.Minify ? " -m" : string.Empty)}{(this.Watch ? " --watch" : string.Empty)}");
 
         this.GeneratedCssFile = this.OutputFile;
 
@@ -79,9 +79,10 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
                 WorkingDirectory = this.ConfigDir,
                 FileName = this.StandaloneCliPath,
                 Arguments = args,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                UseShellExecute = this.Watch,
+                RedirectStandardOutput = !this.Watch,
+                RedirectStandardError = !this.Watch,
+                CreateNoWindow = !this.Watch
             }
         };
 
@@ -103,8 +104,11 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         if (!process.Start())
             this.Log.LogError($"Unable to start process from executable {process.StartInfo.FileName}");
 
-        process.BeginErrorReadLine();
-        process.BeginOutputReadLine();
-        process.WaitForExit();
+        if (!this.Watch)
+        {
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+        }
     }
 }

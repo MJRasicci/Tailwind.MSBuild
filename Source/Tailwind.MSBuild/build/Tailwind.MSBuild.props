@@ -4,20 +4,20 @@
   <PropertyGroup>
     <TailwindMSBuildAssembly Condition="'$(TailwindMSBuildAssembly)' == ''">..\tasks\netstandard2.0\$(MSBuildThisFileName).dll</TailwindMSBuildAssembly>
   </PropertyGroup>
-  
-  <UsingTask TaskName="Tailwind.MSBuild.Tasks.GetTailwindCLI" AssemblyFile="$(TailwindMSBuildAssembly)"/>
-	<UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCSS" AssemblyFile="$(TailwindMSBuildAssembly)"/>
 
-	<PropertyGroup Label="Tailwind.MSBuild Properties">
-		<TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
-		<TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
-		<TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
-		<TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
-		<TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
-		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
-		<TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
-    <TailwindWatch Condition="'$(TailwindWatch)' == '' AND '$(DotNetWatchBuild)' == 'true'">true</TailwindWatch>
+  <UsingTask TaskName="Tailwind.MSBuild.Tasks.GetTailwindCLI" AssemblyFile="$(TailwindMSBuildAssembly)"/>
+  <UsingTask TaskName="Tailwind.MSBuild.Tasks.BuildTailwindCSS" AssemblyFile="$(TailwindMSBuildAssembly)"/>
+
+  <PropertyGroup Label="Tailwind.MSBuild Properties">
+    <TailwindVersion Condition="'$(TailwindVersion)' == ''">latest</TailwindVersion>
+    <TailwindInstallPath Condition="'$(TailwindInstallPath)' == ''">$(MSBuildThisFileDirectory)..\cli\</TailwindInstallPath>
+    <TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
+    <TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
+    <TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
+    <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
+    <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
+    <TailwindWatch Condition="'$(TailwindWatch)' == '' AND ('$(BuildingInsideVisualStudio)' == 'true' OR '$(DotNetWatchBuild)' == 'true')">true</TailwindWatch>
     <TailwindWatch Condition="'$(TailwindWatch)' == ''">false</TailwindWatch>
-	</PropertyGroup>
-	
+  </PropertyGroup>
+
 </Project>

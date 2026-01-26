@@ -147,8 +147,8 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
 
     private static string EnsureTrailingSeparator(string path)
     {
-        if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
-            !path.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+        if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) &&
+            !path.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal))
         {
             path += Path.DirectorySeparatorChar;
         }

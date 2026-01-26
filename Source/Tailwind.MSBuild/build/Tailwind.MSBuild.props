@@ -18,6 +18,7 @@
     <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
     <TailwindWatch Condition="'$(TailwindWatch)' == '' AND ('$(BuildingInsideVisualStudio)' == 'true' OR '$(DotNetWatchBuild)' == 'true')">true</TailwindWatch>
     <TailwindWatch Condition="'$(TailwindWatch)' == ''">false</TailwindWatch>
+    <TailwindLockFile Condition="'$(TailwindLockFile)' == ''">$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock</TailwindLockFile>
   </PropertyGroup>
 
 </Project>

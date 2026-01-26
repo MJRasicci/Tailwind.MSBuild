@@ -17,6 +17,7 @@
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"
                       Watch="$(TailwindWatch)"
+                      WatchLockFile="$(TailwindLockFile)"
                       ProjectDirectory="$(MSBuildProjectDirectory)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
     </BuildTailwindCSS>
@@ -36,6 +37,7 @@
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"
                       Watch="$(TailwindWatch)"
+                      WatchLockFile="$(TailwindLockFile)"
                       ProjectDirectory="$(MSBuildProjectDirectory)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
     </BuildTailwindCSS>

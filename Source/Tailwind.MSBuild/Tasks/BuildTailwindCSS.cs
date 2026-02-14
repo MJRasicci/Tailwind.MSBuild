@@ -72,6 +72,9 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
         {
             var sourcePath = GetPathToSourceDirectory();
 
+            if (!Directory.Exists(this.ConfigDir))
+                Directory.CreateDirectory(this.ConfigDir);
+
             using var file = File.CreateText(this.InputFile);
             file.WriteLine("@import \"tailwindcss\";");
 

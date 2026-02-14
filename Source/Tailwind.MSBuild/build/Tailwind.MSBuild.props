@@ -14,8 +14,8 @@
     <TailwindConfigDir Condition="'$(TailwindConfigDir)' == ''">$(MSBuildProjectDirectory)\Properties\</TailwindConfigDir>
     <TailwindInputFile Condition="'$(TailwindInputFile)' == ''">tailwind.input.css</TailwindInputFile>
     <TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
-    <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Debug'">false</TailwindMinify>
     <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
+    <TailwindMinify Condition="'$(TailwindMinify)' == ''">false</TailwindMinify>
     <TailwindWatch Condition="'$(TailwindWatch)' == '' AND ('$(BuildingInsideVisualStudio)' == 'true' OR '$(DotNetWatchBuild)' == 'true')">true</TailwindWatch>
     <TailwindWatch Condition="'$(TailwindWatch)' == ''">false</TailwindWatch>
     <TailwindLockFile Condition="'$(TailwindLockFile)' == ''">$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock</TailwindLockFile>

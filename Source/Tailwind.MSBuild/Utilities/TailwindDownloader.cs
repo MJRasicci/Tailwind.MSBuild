@@ -64,7 +64,33 @@ internal class TailwindDownloader : IDisposable
         }
 
         var response = await this.client.GetStringAsync(requestUri);
-        return JsonSerializer.Deserialize<GitHubReleaseResponse>(response);
+        return ParseRelease(response);
+    }
+
+    internal static GitHubReleaseResponse ParseRelease(string response)
+    {
+        using var document = JsonDocument.Parse(response);
+
+        var release = new GitHubReleaseResponse();
+        var root = document.RootElement;
+
+        if (root.TryGetProperty("tag_name", out var tagNameProperty))
+            release.TagName = tagNameProperty.GetString() ?? string.Empty;
+
+        if (!root.TryGetProperty("assets", out var assetsProperty) || assetsProperty.ValueKind != JsonValueKind.Array)
+            return release;
+
+        foreach (var assetProperty in assetsProperty.EnumerateArray())
+        {
+            release.Assets.Add(new GitHubReleaseAsset
+            {
+                Name = GetString(assetProperty, "name"),
+                DownloadUrl = GetString(assetProperty, "browser_download_url"),
+                AssetApiUrl = GetString(assetProperty, "url")
+            });
+        }
+
+        return release;
     }
 
     /// <summary>
@@ -76,35 +102,72 @@ internal class TailwindDownloader : IDisposable
     /// <returns>
     ///     A byte array containing the asset.
     /// </returns>
-    public async Task<byte[]> GetAssetAsync(GitHubReleaseAsset tailwindBinary) => await this.client.GetByteArrayAsync(tailwindBinary.DownloadUrl);
+    public async Task<byte[]> GetAssetAsync(GitHubReleaseAsset tailwindBinary)
+    {
+        if (TryCreateAbsoluteUri(tailwindBinary.DownloadUrl, out var browserDownloadUri))
+            return await this.client.GetByteArrayAsync(browserDownloadUri);
+
+        if (!TryCreateAbsoluteUri(tailwindBinary.AssetApiUrl, out var assetApiUri))
+        {
+            throw new InvalidOperationException(
+                $"Unable to determine a valid download URL for '{tailwindBinary.Name}'. " +
+                $"GitHub returned browser_download_url='{tailwindBinary.DownloadUrl}' and url='{tailwindBinary.AssetApiUrl}'.");
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, assetApiUri);
+        request.Headers.TryAddWithoutValidation("Accept", "application/octet-stream");
+
+        using var response = await this.client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsByteArrayAsync();
+    }
+
+    private static string GetString(JsonElement element, string propertyName)
+    {
+        return element.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String
+             ? property.GetString() ?? string.Empty
+             : string.Empty;
+    }
+
+    private static bool TryCreateAbsoluteUri(string uriString, out Uri uri)
+    {
+        return Uri.TryCreate(uriString, UriKind.Absolute, out uri!);
+    }
 }
 
 /// <summary>
 ///     A small response model for the GitHub Releases API.
 /// </summary>
-internal struct GitHubReleaseResponse
+internal sealed class GitHubReleaseResponse
 {
+    /// <summary>
+    ///     The release tag such as v4.2.2.
+    /// </summary>
+    public string TagName { get; set; } = string.Empty;
+
     /// <summary>
     ///     A collection of pre-built binaries for this release.
     /// </summary>
-    [JsonPropertyName("assets")]
-    public IEnumerable<GitHubReleaseAsset> Assets { get; set; }
+    public List<GitHubReleaseAsset> Assets { get; } = [];
 }
 
 /// <summary>
 ///     A small model containing the download information for a release asset.
 /// </summary>
-internal struct GitHubReleaseAsset
+internal sealed class GitHubReleaseAsset
 {
     /// <summary>
     ///     The address to download the asset's binary content.
     /// </summary>
-    [JsonPropertyName("browser_download_url")]
-    public string DownloadUrl { get; set; }
+    public string DownloadUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     The GitHub API address for the release asset.
+    /// </summary>
+    public string AssetApiUrl { get; set; } = string.Empty;
 
     /// <summary>
     ///     The name of the download.
     /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

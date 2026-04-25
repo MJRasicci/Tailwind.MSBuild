@@ -44,7 +44,12 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
         }
         catch (Exception ex)
         {
-            var targetsFile = Path.Combine(Path.GetDirectoryName(this.BuildEngine.ProjectFileOfTaskNode), "build", "Tailwind.MSBuild.targets");
+            var projectFile = this.BuildEngine.ProjectFileOfTaskNode;
+            var projectDirectory = string.IsNullOrWhiteSpace(projectFile) ? string.Empty : Path.GetDirectoryName(projectFile);
+            var targetsFile = string.IsNullOrWhiteSpace(projectDirectory)
+                ? this.BuildEngine.ProjectFileOfTaskNode
+                : Path.Combine(projectDirectory, "build", "Tailwind.MSBuild.targets");
+
             this.Log.LogErrorFromException(ex, true, true, targetsFile);
         }
 
@@ -61,7 +66,9 @@ public class GetTailwindCLI : Microsoft.Build.Utilities.Task
 
         var arch = ProcessorArchitecture.CurrentProcessArchitecture;
 
-        if (arch == ProcessorArchitecture.AMD64)
+        if (platform == "windows" && arch == ProcessorArchitecture.ARM64)
+            arch = "x64";
+        else if (arch == ProcessorArchitecture.AMD64)
             arch = "x64";
         else
             arch = arch.ToLower(CultureInfo.CurrentCulture);

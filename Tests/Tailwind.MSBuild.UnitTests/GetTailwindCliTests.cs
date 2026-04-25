@@ -4,6 +4,10 @@ using Xunit;
 using Tailwind.MSBuild.Tests.Common;
 using Tailwind.MSBuild.Tasks;
 using FluentAssertions;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+using ProcessorArchitecture = Microsoft.Build.Utilities.ProcessorArchitecture;
 
 public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
 {
@@ -46,7 +50,7 @@ public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
         process.WaitForExit();
         process.ExitCode.Should().Be(0);
 
-        Directory.Delete(getTailwindCli.RootInstallPath, true);
+        DeleteDirectory(getTailwindCli.RootInstallPath);
     }
 
     [Fact]
@@ -76,6 +80,45 @@ public class GetTailwindCliTests : IClassFixture<TaskFixture<GetTailwindCLI>>
         if (File.ReadAllText(getTailwindCli.StandaloneCliPath) != "TEST")
             Assert.Fail("File was overwritten");
 
-        Directory.Delete(getTailwindCli.RootInstallPath, true);
+        DeleteDirectory(getTailwindCli.RootInstallPath);
+    }
+
+    [Fact]
+    public void GetFilePath_WindowsArm64_FallsBackToX64Binary()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || ProcessorArchitecture.CurrentProcessArchitecture != ProcessorArchitecture.ARM64)
+            return;
+
+        var getTailwindCli = this.fixture.Prepare(options =>
+        {
+            options.Version = "latest";
+            options.RootInstallPath = $"./{Guid.NewGuid()}/";
+        });
+
+        var filePath = getTailwindCli.GetFilePath();
+
+        filePath.Should().EndWith("tailwindcss-windows-x64.exe");
+    }
+
+    private static void DeleteDirectory(string path)
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            try
+            {
+                if (Directory.Exists(path))
+                    Directory.Delete(path, recursive: true);
+
+                return;
+            }
+            catch (IOException) when (attempt < 4)
+            {
+                Thread.Sleep(250);
+            }
+            catch (UnauthorizedAccessException) when (attempt < 4)
+            {
+                Thread.Sleep(250);
+            }
+        }
     }
 }

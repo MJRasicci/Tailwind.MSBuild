@@ -53,4 +53,44 @@ public class TailwindDownloaderTests : IClassFixture<TailwindDownloaderFixture>
         request.IsCompletedSuccessfully.Should().BeTrue();
         result.Length.Should().BeGreaterThan(0);
     }
+
+    [Fact]
+    public void ParseRelease_PopulatesBrowserDownloadUrl()
+    {
+        const string json = """
+            {
+              "tag_name": "v4.2.2",
+              "assets": [
+                {
+                  "name": "tailwindcss-windows-x64.exe",
+                  "url": "https://api.github.com/repos/tailwindlabs/tailwindcss/releases/assets/376534859",
+                  "browser_download_url": "https://github.com/tailwindlabs/tailwindcss/releases/download/v4.2.2/tailwindcss-windows-x64.exe"
+                }
+              ]
+            }
+            """;
+
+        var release = TailwindDownloader.ParseRelease(json);
+        var asset = release.Assets.Should().ContainSingle().Subject;
+
+        release.TagName.Should().Be("v4.2.2");
+        asset.Name.Should().Be("tailwindcss-windows-x64.exe");
+        asset.AssetApiUrl.Should().Be("https://api.github.com/repos/tailwindlabs/tailwindcss/releases/assets/376534859");
+        asset.DownloadUrl.Should().Be("https://github.com/tailwindlabs/tailwindcss/releases/download/v4.2.2/tailwindcss-windows-x64.exe");
+    }
+
+    [Fact]
+    public async Task GetAssetAsync_InvalidUrlsFailClearly()
+    {
+        var asset = new GitHubReleaseAsset
+        {
+            Name = "tailwindcss-windows-x64.exe"
+        };
+
+        var request = async () => await this.fixture.Client.GetAssetAsync(asset);
+
+        await request.Should()
+                     .ThrowAsync<InvalidOperationException>()
+                     .WithMessage("Unable to determine a valid download URL*");
+    }
 }

@@ -106,8 +106,9 @@ Tailwind.MSBuild supports watch and hot-reload workflows by starting the Tailwin
 
 Auto-detected scenarios:
 - A build defaults to Tailwind watch when `BuildingInsideVisualStudio` or `DotNetWatchBuild` is true, or when the build receives `DOTNET_WATCH=1` or `DOTNET_WATCH=true`. This covers child builds from `dotnet watch build` and `dotnet watch run --no-hot-reload`.
+- With the .NET 10 SDK's hot reload workflow, plain `dotnet watch run` starts Tailwind during the watcher's project scan. In ASP.NET Core apps, the SDK can apply generated CSS changes in the open browser once its hot reload session is ready and the stylesheet is included as a watched static asset.
 
-For hot reload on SDKs that build in the watch host without these signals, run `dotnet watch run --property:TailwindWatch=true` from your project directory. Set `TailwindWatch=false` to opt out of automatic watch mode. Tailwind updates the generated stylesheet on edits. Browser refresh timing depends on the .NET watcher and the application's static asset configuration.
+For SDKs without these watch signals, run `dotnet watch run --property:TailwindWatch=true` from your project directory. Set `TailwindWatch=false` to opt out of automatic watch mode.
 
 On startup, Tailwind.MSBuild compiles the stylesheet before starting the watcher. The initial compilation reports errors to MSBuild. On Linux it tries `xdg-terminal-exec`, `x-terminal-emulator`, and known terminal emulators. Close the terminal window to stop its watcher. If no terminal can launch the CLI, the watcher runs with output redirected to a `.log` file beside the watch lock. The build prints the process ID and log path for that fallback.
 

@@ -1,6 +1,8 @@
 namespace Tailwind.MSBuild.IntegrationTests;
 
 using System.Globalization;
+using System.Threading;
+using System.Xml.Linq;
 using FluentAssertions;
 using Tailwind.MSBuild.Tasks;
 using Xunit;
@@ -49,6 +51,78 @@ public sealed class SampleAppIntegrationTests : IDisposable
         result.StandardOutput.Should().Contain("Program.cs");
         File.Exists(GetInputCssPath(context)).Should().BeFalse();
         File.Exists(GetOutputCssPath(context)).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void WatchRunSampleApp_RespectsTailwindWatchOptOut(bool expectWatcher)
+    {
+        var context = CreateIsolatedSampleApp();
+        SeedCachedTailwindBinary(context.CliCacheRoot);
+
+        var appReady = Path.Combine(context.CliCacheRoot, "app.ready");
+        var cliReady = Path.Combine(context.CliCacheRoot, "watch.ready");
+        var cliStop = Path.Combine(context.CliCacheRoot, "watch.stop");
+        var project = XDocument.Load(context.SampleProjectPath);
+        var settings = new XElement("PropertyGroup",
+            new XElement("ImplicitUsings", "enable"),
+            new XElement("TailwindMSBuildAssembly", context.TaskAssemblyPath),
+            new XElement("TailwindInstallPath", context.CliCacheRoot),
+            new XElement("TailwindVersion", FakeCliVersion));
+        if (!expectWatcher)
+            settings.Add(new XElement("TailwindWatch", "false"));
+        project.Root!.Elements("Import").First().AddBeforeSelf(settings);
+        project.Save(context.SampleProjectPath);
+
+        // Exercise the real watch host without depending on Kestrel ports or browser startup.
+        File.WriteAllText(Path.Combine(context.SampleDirectory, "Program.cs"), """
+            File.WriteAllText(Environment.GetEnvironmentVariable("TAILWIND_TEST_APP_READY")!, "ready");
+            await Task.Delay(Timeout.InfiniteTimeSpan);
+            """);
+
+        try
+        {
+            var result = RunProcess(
+                "dotnet", "watch run --no-launch-profile --non-interactive",
+                context.SampleDirectory,
+                new Dictionary<string, string?>
+                {
+                    ["DOTNET_ROOT"] = GetDotNetRoot(),
+                    ["DOTNET_WATCH"] = null,
+                    ["DotNetWatchBuild"] = null,
+                    ["BuildingInsideVisualStudio"] = null,
+                    ["TailwindWatch"] = null,
+                    ["DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER"] = "1",
+                    ["DISPLAY"] = null,
+                    ["WAYLAND_DISPLAY"] = null,
+                    ["TailwindTerminalExecutable"] = null,
+                    ["TAILWIND_TEST_CLI_EXIT_CODE"] = "0",
+                    ["TAILWIND_TEST_CLI_WRITE_OUTPUT"] = "1",
+                    ["TAILWIND_TEST_APP_READY"] = appReady,
+                    ["TAILWIND_TEST_CLI_READY"] = cliReady,
+                    ["TAILWIND_TEST_CLI_STOP"] = cliStop
+                },
+                stopWhen: () => File.Exists(appReady) && (!expectWatcher || File.Exists(cliReady)));
+
+            File.Exists(appReady).Should().BeTrue("dotnet watch should start the app. StdOut: {0}{1}StdErr: {2}",
+                result.StandardOutput, Environment.NewLine, result.StandardError);
+            File.ReadAllText(GetOutputCssPath(context)).Should().Be(FakeCliOutput);
+            File.Exists(cliReady).Should().Be(expectWatcher);
+
+            var lockFilePath = Path.Combine(context.SampleDirectory, "obj", "tailwind-cli", "watch.lock");
+            File.Exists(lockFilePath).Should().Be(expectWatcher);
+            if (expectWatcher)
+            {
+                using var watchLock = JsonDocument.Parse(File.ReadAllText(lockFilePath));
+                var cliPid = int.Parse(File.ReadAllText(cliReady), CultureInfo.InvariantCulture);
+                watchLock.RootElement.EnumerateArray().Single().GetProperty("pid").GetInt32().Should().Be(cliPid);
+            }
+        }
+        finally
+        {
+            File.WriteAllText(cliStop, "stop");
+        }
     }
 
     [Fact]
@@ -151,7 +225,7 @@ public sealed class SampleAppIntegrationTests : IDisposable
 
         return RunProcess("dotnet", arguments, context.SampleDirectory, new Dictionary<string, string?>
         {
-            ["DOTNET_ROOT"] = Path.GetFullPath(Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "..", "..", "..")),
+            ["DOTNET_ROOT"] = GetDotNetRoot(),
             ["TAILWIND_TEST_CLI_EXIT_CODE"] = exitCode.ToString(CultureInfo.InvariantCulture),
             ["TAILWIND_TEST_CLI_WRITE_OUTPUT"] = writeOutput ? "1" : "0"
         });
@@ -160,6 +234,9 @@ public sealed class SampleAppIntegrationTests : IDisposable
     private static string GetInputCssPath(SampleContext context)
         => Path.Combine(context.SampleDirectory, "Styles", "tailwind.input.css");
 
+    private static string GetDotNetRoot()
+        => Path.GetFullPath(Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "..", "..", ".."));
+
     private static string GetOutputCssPath(SampleContext context)
         => Path.Combine(context.SampleDirectory, "wwwroot", "css", "tailwind.css");
 
@@ -167,7 +244,8 @@ public sealed class SampleAppIntegrationTests : IDisposable
         string fileName,
         string arguments,
         string workingDirectory,
-        IReadOnlyDictionary<string, string?>? environmentVariables = null)
+        IReadOnlyDictionary<string, string?>? environmentVariables = null,
+        Func<bool>? stopWhen = null)
     {
         using var process = new Process
         {
@@ -212,11 +290,24 @@ public sealed class SampleAppIntegrationTests : IDisposable
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        const int timeoutMs = 180000;
-        if (!process.WaitForExit(timeoutMs))
+        try
         {
-            process.Kill(entireProcessTree: true);
-            throw new TimeoutException($"Command timed out after {timeoutMs}ms: {fileName} {arguments}");
+            if (stopWhen == null)
+            {
+                if (!process.WaitForExit(180000))
+                    throw new TimeoutException($"Command timed out: {fileName} {arguments}");
+            }
+            else
+            {
+                // Return captured diagnostics on startup failure or timeout, even when
+                // the watch process stays alive waiting for changes after a failed build.
+                SpinWait.SpinUntil(() => process.HasExited || stopWhen(), TimeSpan.FromSeconds(30));
+            }
+        }
+        finally
+        {
+            if (!process.HasExited)
+                process.Kill(entireProcessTree: true);
         }
 
         process.WaitForExit();
@@ -247,6 +338,7 @@ public sealed class SampleAppIntegrationTests : IDisposable
             using System;
             using System.Globalization;
             using System.IO;
+            using System.Threading;
 
             if (Environment.GetEnvironmentVariable("TAILWIND_TEST_CLI_WRITE_OUTPUT") == "1")
             {
@@ -257,6 +349,14 @@ public sealed class SampleAppIntegrationTests : IDisposable
 
                 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
                 File.WriteAllText(output, "{{FakeCliOutput}}");
+            }
+
+            var ready = Environment.GetEnvironmentVariable("TAILWIND_TEST_CLI_READY");
+            if (ready != null && Array.Exists(args, arg => arg == "--watch" || arg == "--watch=always"))
+            {
+                File.WriteAllText(ready, Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
+                var stop = Environment.GetEnvironmentVariable("TAILWIND_TEST_CLI_STOP");
+                SpinWait.SpinUntil(() => File.Exists(stop), TimeSpan.FromSeconds(45));
             }
 
             return int.Parse(Environment.GetEnvironmentVariable("TAILWIND_TEST_CLI_EXIT_CODE")!, CultureInfo.InvariantCulture);

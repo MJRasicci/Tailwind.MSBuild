@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <!-- The hot reload host builds normally, then collects watch items in a separate
+       design-time compile. The compiler flags distinguish this pass from listing files. -->
+  <PropertyGroup Condition="'$(TailwindWatch)' == 'true' And '$(DotNetWatchBuild)' == 'true' And '$(DesignTimeBuild)' == 'true' And '$(SkipCompilerExecution)' == 'true' And '$(ProvideCommandLineArgs)' == 'true'">
+    <_TailwindHotReloadCollection>true</_TailwindHotReloadCollection>
+    <CustomCollectWatchItems>$(CustomCollectWatchItems);BuildTailwind</CustomCollectWatchItems>
+  </PropertyGroup>
+
   <Target Name="BuildTailwind"
           BeforeTargets="BeforeBuild"
-          Condition="'$(DesignTimeBuild)' != 'true'">
+          Condition="'$(DesignTimeBuild)' != 'true' Or '$(_TailwindHotReloadCollection)' == 'true'">
 
     <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
       <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />

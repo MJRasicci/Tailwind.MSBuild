@@ -98,6 +98,8 @@ Each time you build your project, a css file will be generated at `$(MSBuildProj
 </PropertyGroup>
 ```
 
+On Windows ARM64, the package prefers the release's native executable and uses x64 only when that release omits ARM64. A pinned release can reuse its cached native executable without a GitHub lookup. If the native executable is missing, the package checks the release metadata before using a cached x64 executable. On Windows ARM64, `latest` resolves to a concrete tag so the cache stays specific to that release.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Watch Mode

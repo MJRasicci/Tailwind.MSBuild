@@ -31,9 +31,13 @@ internal class TailwindDownloader : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="TailwindDownloader" /> class.
     /// </summary>
-    public TailwindDownloader()
+    public TailwindDownloader() : this(new HttpClient())
     {
-        this.client = new HttpClient();
+    }
+
+    internal TailwindDownloader(HttpClient client)
+    {
+        this.client = client;
 
         var packageVersion = typeof(TailwindDownloader).Assembly
                                                        .GetCustomAttribute<AssemblyFileVersionAttribute>()?

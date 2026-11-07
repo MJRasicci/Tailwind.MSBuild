@@ -16,7 +16,7 @@
     <TailwindOutputFile Condition="'$(TailwindOutputFile)' == ''">$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutputFile>
     <TailwindMinify Condition="'$(TailwindMinify)' == '' AND '$(Configuration)' == 'Release'">true</TailwindMinify>
     <TailwindMinify Condition="'$(TailwindMinify)' == ''">false</TailwindMinify>
-    <TailwindWatch Condition="'$(TailwindWatch)' == '' AND ('$(BuildingInsideVisualStudio)' == 'true' OR '$(DotNetWatchBuild)' == 'true')">true</TailwindWatch>
+    <TailwindWatch Condition="'$(TailwindWatch)' == '' AND ('$(BuildingInsideVisualStudio)' == 'true' OR '$(DotNetWatchBuild)' == 'true' OR '$(DOTNET_WATCH)' == '1' OR '$(DOTNET_WATCH)' == 'true')">true</TailwindWatch>
     <TailwindWatch Condition="'$(TailwindWatch)' == ''">false</TailwindWatch>
     <TailwindLockFile Condition="'$(TailwindLockFile)' == ''">$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock</TailwindLockFile>
   </PropertyGroup>

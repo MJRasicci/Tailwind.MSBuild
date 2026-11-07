@@ -3,8 +3,6 @@
 
   <Target Name="BuildTailwind"
           BeforeTargets="BeforeBuild"
-          Inputs="$(TailwindInputFile);@(Compile);@(Content)"
-          Outputs="$(TailwindOutputFile)"
           Condition="'$(DesignTimeBuild)' != 'true'">
 
     <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
@@ -17,26 +15,7 @@
                       OutputFile="$(TailwindOutputFile)"
                       Minify="$(TailwindMinify)"
                       Watch="$(TailwindWatch)"
-                      WatchLockFile="$(TailwindLockFile)"
-                      ProjectDirectory="$(MSBuildProjectDirectory)">
-      <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />
-    </BuildTailwindCSS>
-
-  </Target>
-  
-  <Target Name="TailwindStartWatchForDotNetWatch"
-          AfterTargets="GenerateWatchList">
-    
-    <GetTailwindCLI Version="$(TailwindVersion)" RootInstallPath="$(TailwindInstallPath)">
-      <Output TaskParameter="StandaloneCliPath" PropertyName="StandaloneCliPath" />
-    </GetTailwindCLI>
-
-    <BuildTailwindCSS StandaloneCliPath="$(StandaloneCliPath)"
-                      ConfigDir="$(TailwindConfigDir)"
-                      InputFile="$(TailwindInputFile)"
-                      OutputFile="$(TailwindOutputFile)"
-                      Minify="$(TailwindMinify)"
-                      Watch="$(TailwindWatch)"
+                      TerminalExecutable="$(TailwindTerminalExecutable)"
                       WatchLockFile="$(TailwindLockFile)"
                       ProjectDirectory="$(MSBuildProjectDirectory)">
       <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />

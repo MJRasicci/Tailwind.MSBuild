@@ -47,7 +47,7 @@ while [ "$#" -gt 0 ]; do
       output="$2"
       shift 2
       ;;
-    --watch)
+    --watch|--watch=always)
       watch="true"
       shift
       ;;
@@ -63,7 +63,7 @@ if [ -n "$output" ]; then
 fi
 
 if [ "$watch" = "true" ]; then
-  sleep 120
+  exec sleep 120
 fi
 """;
 
@@ -80,28 +80,7 @@ fi
 
         var unixPath = Path.Combine(directory, $"{fileNamePrefix}.sh");
         File.WriteAllText(unixPath, UnixScript, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        EnsureExecutable(unixPath);
+        File.SetUnixFileMode(unixPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         return unixPath;
-    }
-
-    private static void EnsureExecutable(string path)
-    {
-        using var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "chmod",
-                Arguments = $"+x \"{path}\"",
-                UseShellExecute = false,
-                RedirectStandardError = true
-            }
-        };
-
-        process.Start();
-        var stdErr = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-
-        if (process.ExitCode != 0)
-            throw new InvalidOperationException($"Unable to mark fake tailwind cli as executable: {stdErr}");
     }
 }

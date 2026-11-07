@@ -3,13 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
-  
+
   <PropertyGroup>
-    <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)..\..\artifacts\bin\Tailwind.MSBuild\$(Configuration)\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>
+    <TailwindMSBuildAssembly>$(MSBuildThisFileDirectory)..\..\artifacts\bin\Tailwind.MSBuild\$([System.String]::Copy('$(Configuration)').ToLowerInvariant())\Tailwind.MSBuild.dll</TailwindMSBuildAssembly>
     <TailwindInstallPath>$(BaseIntermediateOutputPath)tailwind-cli\</TailwindInstallPath>
+    <TailwindConfigDir>$(MSBuildProjectDirectory)\Styles\</TailwindConfigDir>
   </PropertyGroup>
-  
+
   <Import Project="..\..\Source\Tailwind.MSBuild\build\Tailwind.MSBuild.props" />
   <Import Project="..\..\Source\Tailwind.MSBuild\build\Tailwind.MSBuild.targets" />
-  
+
 </Project>

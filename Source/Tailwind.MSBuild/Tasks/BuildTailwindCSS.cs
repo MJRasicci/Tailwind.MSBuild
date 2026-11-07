@@ -56,211 +56,63 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     public string WatchLockFile { get; set; } = string.Empty;
 
     /// <summary>
+    ///     An optional terminal emulator executable or absolute path used for Linux watch mode.
+    /// </summary>
+    public string TerminalExecutable { get; set; } = string.Empty;
+
+    /// <summary>
     ///     The absolute path to the file where the css was generated.
     /// </summary>
     [Output]
     public string GeneratedCssFile { get; set; } = string.Empty;
+
+    internal TailwindCliRunner CliRunner { get; set; } = new();
 
     /// <summary>
     ///     Builds tailwindcss for the current project.
     /// </summary>
     public override bool Execute()
 	{
-        this.InputFile = Path.Combine(this.ConfigDir, this.InputFile);
+        this.ProjectDirectory = Path.GetFullPath(this.ProjectDirectory);
+        this.StandaloneCliPath = Path.GetFullPath(this.StandaloneCliPath);
+        this.ConfigDir = Path.GetFullPath(this.ConfigDir);
+        this.InputFile = ResolvePath(this.InputFile, this.ConfigDir);
+        this.OutputFile = ResolvePath(this.OutputFile, this.ConfigDir);
+
+        Directory.CreateDirectory(this.ConfigDir);
 
         if (!File.Exists(this.InputFile))
         {
             var sourcePath = GetPathToSourceDirectory();
 
-            if (!Directory.Exists(this.ConfigDir))
-                Directory.CreateDirectory(this.ConfigDir);
+            Directory.CreateDirectory(Path.GetDirectoryName(this.InputFile)!);
 
             using var file = File.CreateText(this.InputFile);
             file.WriteLine("@import \"tailwindcss\";");
 
             if (!string.IsNullOrWhiteSpace(sourcePath))
                 file.WriteLine($"@source \"{sourcePath}\";");
-
-            file.Close();
         }
 
-        // Build
-        RunCli($"-i \"{this.InputFile}\" -o \"{this.OutputFile}\"{(this.Minify ? " -m" : string.Empty)}{(this.Watch ? " --watch" : string.Empty)}");
-
-        this.GeneratedCssFile = this.OutputFile;
-
-        return !this.Log.HasLoggedErrors;
-    }
-
-	private void RunCli(string args)
-	{
-        // The CLI process runs entirely in the background within the directory containing the configuration file
-        using var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
+        this.GeneratedCssFile = string.Empty;
+        var succeeded = this.CliRunner.Run(
+            new TailwindCliInvocation
             {
+                ExecutablePath = this.StandaloneCliPath,
                 WorkingDirectory = this.ConfigDir,
-                FileName = this.StandaloneCliPath,
-                Arguments = args,
-                UseShellExecute = this.Watch,
-                RedirectStandardOutput = !this.Watch,
-                RedirectStandardError = !this.Watch,
-                CreateNoWindow = !this.Watch
-            }
-        };
+                Arguments = BuildCliArguments(),
+                OutputFile = this.OutputFile,
+                Watch = this.Watch,
+                ProjectDirectory = this.ProjectDirectory,
+                WatchLockFile = this.WatchLockFile,
+                WatchTerminalExecutable = this.TerminalExecutable
+            },
+            this.Log);
 
-        // Route stderr and stdio to our TaskLoggingHelper
-        process.ErrorDataReceived += (sender, e) =>
-        {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-                this.Log.LogMessage(e.Data);
-        };
+        if (succeeded)
+            this.GeneratedCssFile = this.OutputFile;
 
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-                this.Log.LogMessage(e.Data);
-        };
-
-        this.Log.LogCommandLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
-
-        if (ShouldUseLockFile())
-        {
-            if (!TryStartProcessWithLock(process))
-                return;
-        }
-        else
-        {
-            if (!StartProcess(process))
-                return;
-        }
-
-        if (!this.Watch)
-        {
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-            process.WaitForExit();
-        }
-    }
-
-    private bool TryStartProcessWithLock(Process process)
-    {
-        var lockFilePath = GetLockFilePath();
-        var lockFileDirectory = Path.GetDirectoryName(lockFilePath);
-
-        if (!string.IsNullOrWhiteSpace(lockFileDirectory))
-            Directory.CreateDirectory(lockFileDirectory);
-
-        using var lockStream = TryOpenLockFileStream(lockFilePath);
-
-        if (lockStream == null)
-        {
-            this.Log.LogMessage(MessageImportance.Low, "Unable to access Tailwind lock file '{0}' after multiple attempts.", lockFilePath);
-            return false;
-        }
-
-        var lockFile = TailwindLockFile.Read(lockStream, out var isCorrupt);
-
-        if (isCorrupt)
-            this.Log.LogMessage(MessageImportance.Low, "Tailwind lock file '{0}' was invalid and has been reset.", lockFilePath);
-
-        var matchingEntries = lockFile.Entries
-                                      .Where(entry => string.Equals(entry.ProjectDirectory, this.ProjectDirectory, StringComparison.OrdinalIgnoreCase))
-                                      .ToList();
-
-        var runningEntry = matchingEntries.FirstOrDefault(entry => IsProcessRunning(entry.ProcessId));
-
-        if (runningEntry != null)
-        {
-            this.Log.LogMessage(MessageImportance.Low, "Tailwind watch already running for '{0}' (PID {1}).", this.ProjectDirectory, runningEntry.ProcessId);
-            return false;
-        }
-
-        if (matchingEntries.Count > 0)
-            lockFile.Entries.RemoveAll(entry => string.Equals(entry.ProjectDirectory, this.ProjectDirectory, StringComparison.OrdinalIgnoreCase));
-
-        if (!StartProcess(process))
-            return false;
-
-        lockFile.Entries.Add(new TailwindLockFileEntry
-        {
-            ProcessId = process.Id,
-            StartedAtUtc = DateTimeOffset.UtcNow,
-            ProjectDirectory = this.ProjectDirectory
-        });
-
-        lockFile.Write(lockStream);
-        return true;
-    }
-
-    private bool StartProcess(Process process)
-    {
-        if (process.Start())
-            return true;
-
-        this.Log.LogError($"Unable to start process from executable {process.StartInfo.FileName}");
-        return false;
-    }
-
-    private bool ShouldUseLockFile()
-    {
-        return this.Watch && !string.IsNullOrWhiteSpace(this.WatchLockFile);
-    }
-
-    private static FileStream? TryOpenLockFileStream(string lockFilePath)
-    {
-        const int maxAttempts = 5;
-        const int retryDelayMs = 100;
-
-        for (var attempt = 0; attempt < maxAttempts; attempt++)
-        {
-            try
-            {
-                return new FileStream(lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-            }
-            catch (IOException) when (attempt < maxAttempts - 1)
-            {
-                System.Threading.Thread.Sleep(retryDelayMs);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                break;
-            }
-        }
-
-        return null;
-    }
-
-    private string GetLockFilePath()
-    {
-        if (Path.IsPathRooted(this.WatchLockFile))
-            return this.WatchLockFile;
-
-        return Path.GetFullPath(Path.Combine(this.ProjectDirectory, this.WatchLockFile));
-    }
-
-    private static bool IsProcessRunning(int processId)
-    {
-        if (processId <= 0)
-            return false;
-
-        try
-        {
-            using var process = Process.GetProcessById(processId);
-            return !process.HasExited;
-        }
-        catch (ArgumentException)
-        {
-            return false;
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
-        catch (System.ComponentModel.Win32Exception)
-        {
-            return false;
-        }
+        return succeeded && !this.Log.HasLoggedErrors;
     }
 
     private string? GetPathToSourceDirectory()
@@ -298,5 +150,29 @@ public class BuildTailwindCSS : Microsoft.Build.Utilities.Task
     private static string NormalizeSlashes(string path)
     {
         return path.Replace('\\', '/');
+    }
+
+    private static string ResolvePath(string path, string relativeToDirectory)
+    {
+        if (Path.IsPathRooted(path))
+            return Path.GetFullPath(path);
+
+        return Path.GetFullPath(Path.Combine(relativeToDirectory, path));
+    }
+
+    private List<string> BuildCliArguments()
+    {
+        var arguments = new List<string>
+        {
+            "-i",
+            this.InputFile,
+            "-o",
+            this.OutputFile
+        };
+
+        if (this.Minify)
+            arguments.Add("-m");
+
+        return arguments;
     }
 }

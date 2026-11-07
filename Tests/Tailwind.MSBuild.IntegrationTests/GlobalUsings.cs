@@ -6,4 +6,5 @@ global using System.IO;
 global using System.Linq;
 global using System.Runtime.InteropServices;
 global using System.Text;
+global using System.Text.Json;
 #pragma warning restore IDE0065 // Misplaced using directive

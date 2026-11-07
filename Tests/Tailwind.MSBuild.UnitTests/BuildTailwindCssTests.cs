@@ -1,6 +1,7 @@
 namespace Tailwind.MSBuild.Tests;
 
 using FluentAssertions;
+using System.Globalization;
 using Tailwind.MSBuild.Tasks;
 using Tailwind.MSBuild.Tests.Common;
 using Tailwind.MSBuild.Utilities;
@@ -102,6 +103,54 @@ public sealed class BuildTailwindCssTests : IDisposable
     }
 
     [Fact]
+    public void WatchMode_OnLinux_UsesConfiguredTerminalExecutable()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        var paths = CreatePaths();
+        var terminalArgumentsPath = Path.Combine(Path.GetDirectoryName(paths.CliPath)!, "terminal.args");
+        var terminalPath = FakeTerminalEmulator.Create(Path.GetDirectoryName(paths.CliPath)!, "x-terminal-emulator", terminalArgumentsPath);
+        var task = CreateTask(paths, watch: true, terminalExecutable: terminalPath, terminalResolver: new TailwindTerminalResolver(pathEnvironment: string.Empty));
+
+        task.Execute().Should().BeTrue();
+
+        SpinWait.SpinUntil(() => File.Exists(terminalArgumentsPath), TimeSpan.FromSeconds(5)).Should().BeTrue();
+        File.ReadAllText(terminalArgumentsPath).Should().Contain("-e");
+
+        var lockFile = ReadLockFile(paths.LockFilePath, out _);
+        lockFile.Entries.Should().ContainSingle();
+        IsProcessRunning(lockFile.Entries.Single().ProcessId).Should().BeTrue();
+
+        this.watchProcessIds.Add(lockFile.Entries.Single().ProcessId);
+    }
+
+    [Fact]
+    public void WatchMode_OnLinux_ReusesCliAfterTerminalLauncherExits()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        var paths = CreatePaths();
+        var toolsDirectory = Path.GetDirectoryName(paths.CliPath)!;
+        var terminalArgumentsPath = Path.Combine(toolsDirectory, "terminal.args");
+        var terminal = FakeTerminalEmulator.Create(toolsDirectory, "x-terminal-emulator", terminalArgumentsPath, brokered: true);
+        var task = CreateTask(paths, watch: true, terminalExecutable: terminal);
+
+        task.Execute().Should().BeTrue();
+        var cliPid = ReadLockFile(paths.LockFilePath, out _).Entries.Single().ProcessId;
+        this.watchProcessIds.Add(cliPid);
+        var launcherPid = int.Parse(File.ReadAllText(terminalArgumentsPath + ".pid"), CultureInfo.InvariantCulture);
+        cliPid.Should().NotBe(launcherPid);
+        SpinWait.SpinUntil(() => !IsProcessRunning(launcherPid), TimeSpan.FromSeconds(5)).Should().BeTrue();
+
+        CreateTask(paths, watch: true, terminalExecutable: terminal).Execute().Should().BeTrue();
+        var reusedPid = ReadLockFile(paths.LockFilePath, out _).Entries.Single().ProcessId;
+        this.watchProcessIds.Add(reusedPid);
+        reusedPid.Should().Be(cliPid);
+    }
+
+    [Fact]
     public void Execute_CreatesMissingConfigDirectoryAndDefaultInputFile()
     {
         var paths = CreatePaths(createConfigDirectory: false);
@@ -139,7 +188,11 @@ public sealed class BuildTailwindCssTests : IDisposable
         }
     }
 
-    private static BuildTailwindCSS CreateTask(TestPaths paths, bool watch)
+    private static BuildTailwindCSS CreateTask(
+        TestPaths paths,
+        bool watch,
+        string? terminalExecutable = null,
+        TailwindTerminalResolver? terminalResolver = null)
     {
         var fixture = new TaskFixture<BuildTailwindCSS>();
 
@@ -152,7 +205,9 @@ public sealed class BuildTailwindCssTests : IDisposable
             task.Minify = false;
             task.Watch = watch;
             task.WatchLockFile = paths.LockFilePath;
+            task.TerminalExecutable = terminalExecutable ?? string.Empty;
             task.ProjectDirectory = paths.ProjectDirectory;
+            task.CliRunner = new TailwindCliRunner(terminalResolver ?? new TailwindTerminalResolver(pathEnvironment: string.Empty));
         });
     }
 

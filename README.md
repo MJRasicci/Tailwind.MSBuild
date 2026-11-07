@@ -105,13 +105,13 @@ Each time you build your project, a css file will be generated at `$(MSBuildProj
 Tailwind.MSBuild supports watch and hot-reload workflows by starting the Tailwind CLI in watch mode when it can detect a watch build.
 
 Auto-detected scenarios:
-- When `$(BuildingInsideVisualStudio)` or `$(DotNetWatchBuild)` is `true`, `TailwindWatch` defaults to `true` and the build runs in watch mode.
-- When running `dotnet watch build` or `dotnet watch run --no-hot-reload`, the `TailwindStartWatchForDotNetWatch` target runs after `GenerateWatchList` to start the build in watch mode.
+- A build defaults to Tailwind watch when `BuildingInsideVisualStudio` or `DotNetWatchBuild` is true, or when the build receives `DOTNET_WATCH=1` or `DOTNET_WATCH=true`. This covers child builds from `dotnet watch build` and `dotnet watch run --no-hot-reload`.
 
-Manual override for hot-reload:
-- When running `dotnet watch run` (the default `dotnet watch` behavior), `GenerateWatchList` is not run and `$(DotNetWatchBuild)` is not set so there is no way to detect those builds. Use `dotnet watch -p:TailwindWatch=true` or add `<TailwindWatch>true</TailwindWatch>` in your MSBuild or project files to force tailwind to start in watch mode.
+For hot reload on SDKs that build in the watch host without these signals, run `dotnet watch run --property:TailwindWatch=true` from your project directory. Set `TailwindWatch=false` to opt out of automatic watch mode. Tailwind updates the generated stylesheet on edits. Browser refresh timing depends on the .NET watcher and the application's static asset configuration.
 
-When watch mode is enabled, Tailwind.MSBuild launches the Tailwind CLI in its own window and does not manage the lifecycle further. Close that window when you want it to stop running.
+On startup, Tailwind.MSBuild compiles the stylesheet before starting the watcher. The initial compilation reports errors to MSBuild. On Linux it tries `xdg-terminal-exec`, `x-terminal-emulator`, and known terminal emulators. Close the terminal window to stop its watcher. If no terminal can launch the CLI, the watcher runs with output redirected to a `.log` file beside the watch lock. The build prints the process ID and log path for that fallback.
+
+If Linux auto-detection picks the wrong terminal, or you want to force a specific one, set `TailwindTerminalExecutable` to a supported terminal executable name or absolute path.
 
 To avoid duplicate Tailwind CLI instances during watch builds, Tailwind.MSBuild tracks running processes in a lock file. You can override the lock file location with `TailwindLockFile`.
 
@@ -131,7 +131,8 @@ If you want to change any of the default settings Tailwind.MSBuild uses, you can
 | TailwindInputFile     | `tailwind.input.css`                                                              | The name of the input css file.                            |
 | TailwindOutputFile    | `$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css`                             | The path where the output css file will be located.        |
 | TailwindMinify        | `false` for Debug builds, `true` for Release builds                               | Whether the generated css should be minified or not.       |
-| TailwindWatch         | `true` when `BuildingInsideVisualStudio` or `DotNetWatchBuild`, otherwise `false` | Whether Tailwind runs in watch mode.                       |
+| TailwindWatch         | `true` in detected watch builds, otherwise `false`                                   | Whether Tailwind runs in watch mode.                       |
+| TailwindTerminalExecutable | ``                                                                             | Optional Linux watch-mode terminal override.               |
 | TailwindLockFile      | `$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock`                           | The path to the Tailwind CLI lock file.                    |
 
 >### ⚠️ *A note about `TailwindInstallPath`*:
@@ -154,6 +155,8 @@ Here is a sample configuration that overrides every setting.
   <TailwindMinify>true</TailwindMinify>
   <!-- Force watch mode -->
   <TailwindWatch>true</TailwindWatch>
+  <!-- Optional Linux terminal override -->
+  <TailwindTerminalExecutable>x-terminal-emulator</TailwindTerminalExecutable>
   <!-- Override lock file location -->
   <TailwindLockFile>$(BaseIntermediateOutputPath)\tailwind-cli\watch.lock</TailwindLockFile>
 </PropertyGroup>
@@ -190,6 +193,7 @@ For advanced scenarios where you need to run the tasks during a different point 
 | OutputFile        | TailwindOutputFile         |
 | Minify            | TailwindMinify             |
 | Watch             | TailwindWatch              |
+| TerminalExecutable | TailwindTerminalExecutable |
 | WatchLockFile     | TailwindLockFile           |
 | ProjectDirectory  | MSBuildProjectDirectory    |
 
@@ -200,6 +204,7 @@ For advanced scenarios where you need to run the tasks during a different point 
                   OutputFile="$(TailwindOutputFile)"
                   Minify="$(TailwindMinify)"
                   Watch="$(TailwindWatch)"
+                  TerminalExecutable="$(TailwindTerminalExecutable)"
                   WatchLockFile="$(TailwindLockFile)"
                   ProjectDirectory="$(MSBuildProjectDirectory)">
   <Output TaskParameter="GeneratedCssFile" PropertyName="GeneratedCssFile" />

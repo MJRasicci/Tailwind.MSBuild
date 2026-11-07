@@ -2,6 +2,11 @@ name: Build, Test & Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Published stable release tag to retry on NuGet.org (for example, v2.1.0)'
+        required: true
+        type: string
   push:
     branches: [ main ]
   pull_request:
@@ -42,11 +47,32 @@ jobs:
       
   build:
     name: Build Package
-    if: github.event_name == 'push' || github.event_name == 'release'
+    if: >-
+      github.event_name == 'push' || github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    permissions:
+      contents: read
     runs-on: windows-latest
     steps:
+    - name: Verify release for manual retry
+      if: github.event_name == 'workflow_dispatch'
+      env:
+        GH_TOKEN: ${{ github.token }}
+        RELEASE_TAG: ${{ inputs.release_tag }}
+      run: |
+        if ($env:RELEASE_TAG -cnotmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
+          throw 'Enter a stable release tag such as v2.1.0.'
+        }
+        $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,isPrerelease,publishedAt | ConvertFrom-Json
+        if ($LASTEXITCODE -ne 0 -or $release.tagName -cne $env:RELEASE_TAG -or
+            $release.isDraft -or $release.isPrerelease -or -not $release.publishedAt) {
+          throw "Release '$env:RELEASE_TAG' must be a published stable release in this repository."
+        }
+      shell: pwsh
     - name: Checkout
       uses: actions/checkout@v7.0.1
+      with:
+        ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.release_tag) || '' }}
     - name: Setup .NET
       uses: actions/setup-dotnet@v6.1.0
       with:
@@ -88,19 +114,34 @@ jobs:
   push-nuget:
     name: Push NuGet Package
     needs: build
-    if: github.event_name == 'release' && !github.event.release.prerelease
+    if: >-
+      (github.event_name == 'release' && !github.event.release.prerelease) ||
+      github.event_name == 'workflow_dispatch'
     environment:
       name: "NuGet"
       url: https://www.nuget.org/packages/Tailwind.MSBuild
+    permissions:
+      id-token: write
     runs-on: windows-latest
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v8.0.2
         with:
           name: "windows-latest"
+      - name: NuGet Trusted Publishing login
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: MJRasicci
       - name: Dotnet NuGet Push
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
-          Get-ChildItem .\ -Filter *.nupkg |
-          Where-Object { !$_.Name.Contains('dev') } |
-          ForEach-Object { dotnet nuget push $_ --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} }
+          if ($env:RELEASE_TAG -cnotmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
+            throw "Expected a stable release tag, got '$env:RELEASE_TAG'."
+          }
+          $version = $env:RELEASE_TAG.Substring(1)
+          $package = Get-Item -LiteralPath "Tailwind.MSBuild.$version.nupkg" -ErrorAction Stop
+          dotnet nuget push $package.FullName --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key $env:NUGET_API_KEY
         shell: pwsh

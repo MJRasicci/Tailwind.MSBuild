@@ -15,6 +15,7 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <Compile Include="..\AssertionEngineInitializer.cs" Link="AssertionEngineInitializer.cs" />
     <ProjectReference Include="..\..\Source\Tailwind.MSBuild\Tailwind.MSBuild.csproj" />
   </ItemGroup>
 	

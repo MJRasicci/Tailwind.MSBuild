@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Published stable release tag to retry on NuGet.org (for example, v2.1.0)'
+        description: 'Published release tag to recover on NuGet.org (v2.1.0 or v2.2.0-preview.1)'
         required: true
         type: string
   push:
@@ -12,7 +12,7 @@ on:
   pull_request:
   release:
     types: [ published ]
-    
+
 env:
   # Disable the .NET logo in the console output.
   DOTNET_NOLOGO: true
@@ -20,13 +20,49 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   # Disable sending .NET CLI telemetry to Microsoft.
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  # Set the build number in MinVer.
+  # Set assembly informational metadata; this does not change package identity.
   MINVERBUILDMETADATA: build.${{github.run_number}}
 
+# Builds and tests do not receive publishing permissions.
+permissions:
+  contents: read
+
 jobs:
+  prepare:
+    name: Validate Build Source
+    runs-on: ubuntu-latest
+    outputs:
+      source_sha: ${{ steps.source.outputs.source_sha }}
+      version: ${{ steps.source.outputs.version }}
+      should_run: ${{ steps.source.outputs.should_run }}
+      publish: ${{ steps.source.outputs.publish }}
+    steps:
+      # For manual recovery this is main's workflow revision, not the release tag.
+      - name: Checkout workflow revision
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Test release safeguards
+        run: ./.github/scripts/Test-ReleasePreparation.ps1
+        shell: pwsh
+      - name: Validate source and publication
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
+          EVENT_SHA: ${{ github.sha }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+        run: >-
+          ./.github/scripts/Resolve-Release.ps1
+          -EventName $env:EVENT_NAME -EventRef $env:EVENT_REF
+          -EventSha $env:EVENT_SHA -ReleaseTag $env:RELEASE_TAG
+        shell: pwsh
+
   test:
     name: Test-${{matrix.os}}
-    if: github.event_name == 'pull_request'
+    needs: prepare
+    if: needs.prepare.outputs.should_run == 'true'
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -34,6 +70,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v7.0.1
+      with:
+        ref: ${{ needs.prepare.outputs.source_sha }}
+        fetch-depth: 0
     - name: Setup .NET
       uses: actions/setup-dotnet@v6.1.0
       with:
@@ -43,36 +82,21 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test
-      
+      run: dotnet test -c Release --no-build --no-restore
+
   build:
     name: Build Package
-    if: >-
-      github.event_name == 'push' || github.event_name == 'release' ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    needs: [prepare, test]
+    if: needs.prepare.outputs.should_run == 'true' && github.event_name != 'pull_request'
     permissions:
       contents: read
     runs-on: windows-latest
     steps:
-    - name: Verify release for manual retry
-      if: github.event_name == 'workflow_dispatch'
-      env:
-        GH_TOKEN: ${{ github.token }}
-        RELEASE_TAG: ${{ inputs.release_tag }}
-      run: |
-        if ($env:RELEASE_TAG -cnotmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
-          throw 'Enter a stable release tag such as v2.1.0.'
-        }
-        $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,isPrerelease,publishedAt | ConvertFrom-Json
-        if ($LASTEXITCODE -ne 0 -or $release.tagName -cne $env:RELEASE_TAG -or
-            $release.isDraft -or $release.isPrerelease -or -not $release.publishedAt) {
-          throw "Release '$env:RELEASE_TAG' must be a published stable release in this repository."
-        }
-      shell: pwsh
     - name: Checkout
       uses: actions/checkout@v7.0.1
       with:
-        ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.release_tag) || '' }}
+        ref: ${{ needs.prepare.outputs.source_sha }}
+        fetch-depth: 0
     - name: Setup .NET
       uses: actions/setup-dotnet@v6.1.0
       with:
@@ -83,11 +107,35 @@ jobs:
       run: dotnet build -c Release --no-restore
     - name: Pack
       run: dotnet pack -c Release --output nupkgs --no-build
+    - name: Verify release package version
+      if: needs.prepare.outputs.publish == 'true'
+      env:
+        RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+      run: |
+        $packages = @(Get-ChildItem -LiteralPath nupkgs -Filter '*.nupkg')
+        if ($packages.Count -ne 1 -or $packages[0].Name -cne "Tailwind.MSBuild.$env:RELEASE_VERSION.nupkg") {
+          throw 'MinVer package version does not match the selected release tag. Nothing will be published.'
+        }
+        $archive = [System.IO.Compression.ZipFile]::OpenRead($packages[0].FullName)
+        try {
+          $entry = $archive.GetEntry('Tailwind.MSBuild.nuspec')
+          if ($null -eq $entry) { throw 'The release package is missing its expected nuspec.' }
+          $reader = [System.IO.StreamReader]::new($entry.Open())
+          try { [xml] $manifest = $reader.ReadToEnd() }
+          finally { $reader.Dispose() }
+          if ($manifest.package.metadata.id -cne 'Tailwind.MSBuild' -or
+              $manifest.package.metadata.version -cne $env:RELEASE_VERSION) {
+            throw 'The package manifest does not match the selected release version.'
+          }
+        }
+        finally { $archive.Dispose() }
+      shell: pwsh
     - name: Publish Artifacts
       uses: actions/upload-artifact@v7.0.2
       with:
         name: "windows-latest"
         path: "./nupkgs/*.nupkg"
+        if-no-files-found: error
 
   push-github:
     name: Push GitHub Package
@@ -110,13 +158,11 @@ jobs:
       - name: Dotnet NuGet Push
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GH_PACKAGES_TOKEN }} --source github --skip-duplicate
         shell: pwsh
-        
+
   push-nuget:
     name: Push NuGet Package
-    needs: build
-    if: >-
-      (github.event_name == 'release' && !github.event.release.prerelease) ||
-      github.event_name == 'workflow_dispatch'
+    needs: [prepare, build]
+    if: needs.prepare.outputs.publish == 'true'
     environment:
       name: "NuGet"
       url: https://www.nuget.org/packages/Tailwind.MSBuild
@@ -135,13 +181,10 @@ jobs:
           user: MJRasicci
       - name: Dotnet NuGet Push
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
-          if ($env:RELEASE_TAG -cnotmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
-            throw "Expected a stable release tag, got '$env:RELEASE_TAG'."
-          }
-          $version = $env:RELEASE_TAG.Substring(1)
-          $package = Get-Item -LiteralPath "Tailwind.MSBuild.$version.nupkg" -ErrorAction Stop
-          dotnet nuget push $package.FullName --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key $env:NUGET_API_KEY
+          $package = Get-Item -LiteralPath "Tailwind.MSBuild.$env:RELEASE_VERSION.nupkg" -ErrorAction Stop
+          # A concurrent publication must fail, never create or increment a version.
+          dotnet nuget push $package.FullName --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY
         shell: pwsh
